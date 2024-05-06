@@ -55,7 +55,7 @@ class HydraulicSystem(System):
         },
         **kwargs
     ):
-        self.super().__init__(
+        super().__init__(
             *args,
             system_parameters_init=system_parameters_init,
             **kwargs
@@ -203,15 +203,15 @@ class HydraulicSystem(System):
         v_j = self._parameters["v_j"]
         We_j = rho_work*v_j**2*D_exit/(1e6*sigma_work)
         Re_j = rho_work*v_j*D_exit/(1e3*mu_work)
-        Oh_j = np.sqrt(self.We_j)/self.Re_j
+        Oh_j = np.sqrt(We_j)/Re_j
          
         # JET LENGTH AND DROP DIAMETER
         # Critical jet length
         # see https://doi.org/10.1007/s00348-003-0629-6
-        l_crit = 13.4e3*(np.sqrt(self.We_j)\
-            + 3*self.We_j/self.Re_j) * D_exit
+        l_crit = 13.4e3*(np.sqrt(We_j)\
+            + 3*We_j/Re_j) * D_exit
         # Estimated Droplet diameter
-        D_drop = 1e3*(1.5*np.pi*np.sqrt(2 + 3*self.Oh_j))**(1/3) * D_exit
+        D_drop = 1e3*(1.5*np.pi*np.sqrt(2 + 3*Oh_j))**(1/3) * D_exit
         self.update_system_parameters(
             {
                 "l_crit": l_crit,
@@ -262,10 +262,10 @@ class HydraulicSystem(System):
             )
         
         # System params
-        p_l, x_th_eps, ploss_coef_h, p_hydr_last, x_p_last, beta_v_hydr = (
+        p_l, x_th_eps, ploss_coef_hydr, p_hydr_last, x_p_last, beta_v_hydr = (
             self._parameters["p_l"],
             self._parameters["x_th_eps"],
-            self._parameters["ploss_coef_h"],
+            self._parameters["ploss_coef_hydr"],
             self._parameters["_p_hydr_last"],
             self._parameters["_x_p_last"],
             self._parameters["beta_v_hydr"],
@@ -278,7 +278,7 @@ class HydraulicSystem(System):
             if v_p != 0: 
                 # self.x_th_eps refers to somekind of backslash
                 pressure_hydraulic -= v_p*(abs(v_p)/\
-                    max(x_th_eps, x_th)**2)*ploss_coef_h
+                    max(x_th_eps, x_th)**2)*ploss_coef_hydr
             
             # Save piston position and hydraulic pressure if throttle is opened
             self.update_system_parameters(
@@ -321,12 +321,12 @@ class HydraulicSystem(System):
             )
         
         # Required parameters
-        x_p_init, p_capillar_max, beta_v_work, p_atm, ploss_coef_t = (
+        x_p_init, p_capillar_max, beta_v_work, p_atm, ploss_coef_work = (
             self._parameters["_x_p_init"],
             self._parameters["p_capillar_max"],
             self._parameters["beta_v_work"],
             self._parameters["p_atm"],
-            self._parameters["ploss_coef_t"],
+            self._parameters["ploss_coef_work"],
         )
         
         # Position difference
@@ -341,7 +341,7 @@ class HydraulicSystem(System):
             
         # dynamic pressure loss happends only when there is a flow rate
         if v_p != 0:
-            pressure_working += v_p*abs(v_p) * ploss_coef_t
+            pressure_working += v_p*abs(v_p) * ploss_coef_work
         
         return pressure_working
     
