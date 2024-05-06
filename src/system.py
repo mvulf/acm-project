@@ -21,7 +21,7 @@ class HydraulicSystem(System):
     _observation_naming = ["jet length [mm]", "jet velocity [mm/s]"]
     _inputs_naming = ["throttle_action"]
     _action_bounds = [[-20.0, 20.0]]
-    
+     
     def __init__(
         self,
         *args,
@@ -524,3 +524,23 @@ class HydraulicSystem(System):
         )
         
         return observation
+    
+
+# class KinematicPoint(System):
+#     _name = "kinematic-point"
+#     _system_type = "diff_eqn"
+#     _dim_state = 2
+#     _dim_inputs = 2
+#     _dim_observation = 2
+#     _observation_naming = _state_naming = ["x", "y"]
+#     _inputs_naming = ["v_x", "v_y"]
+#     _action_bounds = [[-10.0, 10.0], [-10.0, 10.0]]
+
+#     def _compute_state_dynamics(self, time, state, inputs):
+#         return inputs  # The velocity inputs directly define the rate of change of position.
+
+
+if __name__ == '__main__':
+    system = HydraulicSystem()
+    
+    # system = KinematicPoint()
