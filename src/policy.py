@@ -3,7 +3,7 @@ import numpy as np
 from regelum.policy import Policy
 from regelum.utils import rg
 
-from src.system import HydraulicSystemFull
+from src.system import HydraulicSystemSimpleRg
 
 
 def get_relative_observation(observation, l_crit:float, sampling_time:float):
@@ -12,8 +12,8 @@ def get_relative_observation(observation, l_crit:float, sampling_time:float):
         prototype=observation,
     )
     
-    relative_observation[0] = observation[0] / l_crit
-    relative_observation[1] = observation[1] / l_crit * sampling_time
+    relative_observation[:,0] = observation[:,0] / l_crit
+    relative_observation[:,1] = observation[:,1] / l_crit * sampling_time
     
     return relative_observation
 
@@ -21,7 +21,7 @@ def get_relative_observation(observation, l_crit:float, sampling_time:float):
 class PDController(Policy):
     def __init__(
         self,
-        system: HydraulicSystemFull,
+        system: HydraulicSystemSimpleRg,
         sampling_time: float,
         P_coef:float=20.,
         D_coef:float=0.,
@@ -35,18 +35,18 @@ class PDController(Policy):
             D_coef,
         ]
         
-        def get_action(self, observation):
-            
-            relative_observation = get_relative_observation(
-                observation=observation,
-                l_crit=self.system._parameters["l_crit"],
-                sampling_time=sampling_time,
-            )
-            
-            action = (
-                self.P_coef * (1 - relative_observation[0]) 
-                - self.D_coef * relative_observation[1]
-            )
-            action = np.array([[action]])
-            
-            return action
+    def get_action(self, observation):
+        
+        relative_observation = get_relative_observation(
+            observation=observation,
+            l_crit=self.system._parameters["l_crit"],
+            sampling_time=self.sampling_time,
+        )
+        
+        action = (
+            self.pd_coefs[0] * (1 - relative_observation[:,0]) 
+            - self.pd_coefs[1] * relative_observation[:,1]
+        )
+        # action = rg.array(action, prototype=observation)
+        
+        return action
