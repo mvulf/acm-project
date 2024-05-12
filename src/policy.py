@@ -46,7 +46,6 @@ class PDController(Policy):
         action = (
             self.pd_coefs[0] * (1 - relative_observation[:,0]) 
             - self.pd_coefs[1] * relative_observation[:,1]
-        )
-        # action = rg.array(action, prototype=observation)
+        )*0.01
         
-        return action
+        return np.array([action])

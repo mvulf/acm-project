@@ -464,6 +464,9 @@ class HydraulicSystemFull(System):
             
         return Dstate
     
+    def compute_closed_loop_rhs(self, time, state):
+        return self._compute_state_dynamics(time, state, self.inputs)
+    
     
     def get_clean_observation(self, state):
         """Get clean observations 
@@ -522,6 +525,7 @@ class HydraulicSystemFull(System):
         observation[1] += np.random.normal(
             scale=self._parameters["jet_velocity_std"]
         )
+
         
         return observation
     
@@ -1339,6 +1343,9 @@ class HydraulicSystemSimpleRg(System):
             # self._parameters["beta_v_hydr"],
         )
 
+        # print('X_th: ', x_th)
+        # print('x_th_eps: ', x_th_eps)
+
         pressure_hydraulic_open = (
             p_l
             - v_p*ploss_coef_hydr*rg.abs(v_p)/\
@@ -1366,6 +1373,8 @@ class HydraulicSystemSimpleRg(System):
         #             "_p_hydr_last": pressure_hydraulic,
         #         }
         #     )
+
+        # print('pressure_hydraulic: ', pressure_hydraulic)
 
         return pressure_hydraulic
     
@@ -1419,6 +1428,8 @@ class HydraulicSystemSimpleRg(System):
             pressure_working
         )
 
+        # print('pressure working: ', pressure_working)
+
         return pressure_working
     
     
@@ -1438,7 +1449,8 @@ class HydraulicSystemSimpleRg(System):
         p_hydr = self.get_pressure_hydraulic(state)
         p_work = self.get_pressure_working(state)
         
-        A_hydr, A_work = self._parameters["A_hydr"], self._parameters["A_work"]        
+        A_hydr, A_work = self._parameters["A_hydr"], self._parameters["A_work"]
+        # print("works: ", A_hydr, A_work)        
         return A_hydr*p_hydr - A_work*p_work
     
     
@@ -1470,9 +1482,11 @@ class HydraulicSystemSimpleRg(System):
         
         F_fr_dynamic = -rg.sign(v_p) * rg.if_else(F_c > F_fr_h, F_c, F_fr_h)
         # If piston does not move
-        F_fr_static = -rg.sign(F_g + F_h) * F_c
+        F_fr_static = -rg.if_else(F_g + F_h > 0, 1, -1) * F_c #####################################
         
         F_fr = rg.if_else(v_p != 0, F_fr_dynamic, F_fr_static)
+
+        # print('force freion: ', F_fr)
 
         return F_fr
     
@@ -1503,15 +1517,17 @@ class HydraulicSystemSimpleRg(System):
             self._parameters["m_p"],
         )
         
-        cond_velocity = (v_p != 0)
-        cond_fr_overcome = (rg.abs(F_h + F_g) > rg.abs(F_fr))
+        cond_velocity = rg.if_else(v_p != 0, 1, 0) ################################################################
+        cond_fr_overcome = rg.if_else(rg.abs(F_h + F_g) > rg.abs(F_fr), 1, 0)
         
         # return 0, if piston does not move and acting force lower than friction
-        acceleration = rg.if_else(
-            (cond_velocity + cond_fr_overcome) > 0, # OR
-            1e6*(g + 1/m_p * (F_h + F_fr)),
-            0
-        )
+        # acceleration = rg.if_else(
+            # (cond_velocity + cond_fr_overcome) > 0, # OR
+        acceleration = 1e6*(g + 1/m_p * (F_h + F_fr))
+            # 0.0001
+        # )
+
+        # print("accerelarton: ", acceleration)
 
         return acceleration
     
@@ -1557,6 +1573,8 @@ class HydraulicSystemSimpleRg(System):
         k = 1.
         Dstate[2] = v_th_max * (k*x_th_act - state[2])
 
+        # print('Dstate: ', Dstate)
+
         return Dstate
     
     
@@ -1578,6 +1596,8 @@ class HydraulicSystemSimpleRg(System):
             prototype=state,
         )
         
+        # print("State -1:", state)
+
         # # Define init piston position
         # if self._parameters["_x_p_init"] is None:
         #     self.update_system_parameters(
@@ -1590,6 +1610,8 @@ class HydraulicSystemSimpleRg(System):
             self._parameters["x_p_init"],
             self._parameters["D_work_exit_2_ratio"]
         )
+
+        # print("paramters -1: ", x_p_init, D_work_exit_2_ratio)
         
         # Jet length
         observation[0] = (
@@ -1600,6 +1622,8 @@ class HydraulicSystemSimpleRg(System):
         observation[1] = (
             1e-3 * v_p * D_work_exit_2_ratio
         )
+
+        # print("Observationn -1: ", observation)
         
         return observation
     
