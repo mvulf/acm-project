@@ -7,7 +7,7 @@ class SciPy(Simulator):
         import scipy as sp
 
         ODE_solver = sp.integrate.RK45(
-            self.system._compute_state_dynamics,
+            self.system.compute_closed_loop_rhs,
             0, # initial time
             self.state, # initial state
             self.time_final, # t_bound
