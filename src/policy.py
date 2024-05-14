@@ -23,7 +23,7 @@ class PDController(Policy):
         self,
         system: HydraulicSystemSimpleRg,
         sampling_time: float,
-        P_coef:float=20.,
+        P_coef:float=25.,
         D_coef:float=0.,
     ):
         super().__init__()
@@ -46,6 +46,6 @@ class PDController(Policy):
         action = (
             self.pd_coefs[0] * (1 - relative_observation[:,0]) 
             - self.pd_coefs[1] * relative_observation[:,1]
-        )*0.01
+        )
         
         return np.array([action])

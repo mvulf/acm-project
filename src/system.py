@@ -391,7 +391,7 @@ class HydraulicSystemFull(System):
             self._parameters["F_g"],
         )
         
-        if v_p != 0:
+        if v_p != 0: # NOTE: WAS "if v_p > 0:""
             return - np.sign(v_p) * max(F_c, (1-eta)*F_h)
         # If piston does not move
         return -np.sign(F_g + F_h) * F_c
@@ -526,7 +526,6 @@ class HydraulicSystemFull(System):
             scale=self._parameters["jet_velocity_std"]
         )
 
-        
         return observation
     
 
@@ -1013,6 +1012,10 @@ class HydraulicSystemFullRg(System):
         state[2] = rg.if_else(cond_th_dyn, state[2], x_th)
 
         return Dstate
+    
+    
+    def compute_closed_loop_rhs(self, time, state):
+        return self._compute_state_dynamics(time, state, self.inputs)
     
     
     def get_clean_observation(self, state):
@@ -1563,19 +1566,23 @@ class HydraulicSystemSimpleRg(System):
         )
         # \dot{x_th}
         # if real throttle position is differ from the set one, change it
-        # cond_th_dyn = (rg.abs(x_th_act - x_th) > dx_th_eps)
-        # Dstate[2] = rg.if_else(
-        #     cond_th_dyn, rg.sign(x_th_act - x_th) * v_th_max, 0
-        # )
-        # x_th = rg.if_else(cond_th_dyn, x_th, x_th_act)
-        # state[2] = rg.if_else(cond_th_dyn, state[2], x_th)
+        cond_th_dyn = (rg.abs(x_th_act - x_th) > dx_th_eps)
+        Dstate[2] = rg.if_else(
+            cond_th_dyn, rg.sign(x_th_act - x_th) * v_th_max, 0
+        )
+        x_th = rg.if_else(cond_th_dyn, x_th, x_th_act)
+        state[2] = rg.if_else(cond_th_dyn, state[2], x_th)
         
-        k = 1.
-        Dstate[2] = v_th_max * (k*x_th_act - state[2])
+        # k = 1.
+        # Dstate[2] = v_th_max * (k*x_th_act - state[2])
 
         # print('Dstate: ', Dstate)
 
         return Dstate
+    
+    
+    def compute_closed_loop_rhs(self, time, state):
+        return self._compute_state_dynamics(time, state, self.inputs)
     
     
     def get_clean_observation(self, state):
