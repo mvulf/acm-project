@@ -63,13 +63,35 @@ class SciPy(Simulator):
     @property
     def state(self):
         return self._state
+    
+    # def save_state_history(state):
+    def receive_action(self, action):
+        # print("sim receive action: ", action)
+        self.state_history[-1].append(action[0])
+        self.system.receive_action(action)
 
     @state.setter
     def state(self, new_state):
+        # print(new_state, self.time)
+        try:
+            # print("append")
+            self.state_history.append([new_state, self.time])
+        except:
+            print("history no exist")
+            # self.state_history = []
+        
         self._state = new_state
 
 
     def initialize_ode_solver(self):
+        # print("Init solver", [self.state_init, self.time])
+        # try:
+        try:
+            last_mark = self.state_history[-1]
+        except:
+            print("create hist")
+            self.state_history = [[self.state_init, self.time]]
+
         assert self.time_final is not None and self.max_step is not None, (
             "Must specify time_final and max_step"
             + " in order to initialize SciPy solver"
@@ -92,9 +114,10 @@ class SciPy(Simulator):
         ODE_solver = self.SciPySolver(self)
         return ODE_solver
     
-    
     def reset(self):
+
         if self.system.system_type == "diff_eqn":
+            # self.state_history = []
             self.time = 0.0
             self.ODE_solver = self.initialize_ode_solver()
             self.state = self.state_init
@@ -102,6 +125,7 @@ class SciPy(Simulator):
                 time=self.time, state=self.state_init, inputs=self.action_init
             )
         else:
+            # self.state_history = []
             self.time = 0.0
             self.observation = self.get_observation(
                 time=self.time, state=self.state_init, inputs=self.system.inputs
