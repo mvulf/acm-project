@@ -548,6 +548,8 @@ class HydraulicSystem(System):
             
         return Dstate
     
+    def compute_closed_loop_rhs(self, time, state):
+        return self._compute_state_dynamics(time, state, self.inputs)
     
     def get_clean_observation(self, state):
         """Get clean observations 

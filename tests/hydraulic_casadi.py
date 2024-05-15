@@ -8,7 +8,7 @@ from regelum.simulator import CasADi
 import sys
 sys.path.append('./')
 
-from src.system import HydraulicSystemSimpleRg
+from src._system import HydraulicSystemSimpleRg
 from src.policy import PDController
 
 from regelum.utils import RCType

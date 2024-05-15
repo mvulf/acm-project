@@ -3,7 +3,7 @@ import numpy as np
 from regelum.policy import Policy
 from regelum.utils import rg
 
-from src.system import HydraulicSystemSimpleRg
+# from src._system import HydraulicSystemSimpleRg
 
 
 def get_relative_observation(observation, l_crit:float, sampling_time:float):
@@ -21,7 +21,7 @@ def get_relative_observation(observation, l_crit:float, sampling_time:float):
 class PDController(Policy):
     def __init__(
         self,
-        system: HydraulicSystemSimpleRg,
+        system, # TODO: CHANGE!
         sampling_time: float,
         P_coef:float=25.,
         D_coef:float=0.,
