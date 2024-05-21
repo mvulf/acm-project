@@ -1,11 +1,12 @@
 
 from regelum.system import System
-
+from regelum.callback import detach
 import numpy as np
+
 from regelum.utils import rg
 
 
-class HydraulicSystem(System):
+class HydraulicSystemRg(System):
     
     _name = 'HydraulicSystem'
     _system_type = 'diff_eqn'
@@ -166,6 +167,12 @@ class HydraulicSystem(System):
         zeta_th = self._parameters["zeta_th"]
         C_D_th = 1/zeta_th**(1/2)
         C_D_exit = 0.827 - 0.0085*l_exit/D_exit
+        # self.update_system_parameters(
+        #     {
+        #         "C_D_th": C_D_th,
+        #         "C_D_exit": C_D_exit,
+        #     }
+        # )
         
         # Liquid params
         rho_hydr, rho_work, sigma_work, mu_work = (
@@ -216,9 +223,24 @@ class HydraulicSystem(System):
                 "D_drop": D_drop,
             }
         )
+        
+        # # RESET init state to None
+        # self.reset()
     
+    
+    # def reset(self) -> None:
+    #     """Reset system to undefined state."""
+    #     self.init_state = None
     
     def _compute_state_dynamics(self, time, state, inputs):
+        
+        # # Check that initial state was set
+        # if self.init_state is None:
+        #     self.init_state = np.copy(state)
+        
+        # Dstate = np.zeros(
+        #     self.dim_state,
+        # )
         
         Dstate = rg.zeros(
             self.dim_state,
@@ -234,9 +256,18 @@ class HydraulicSystem(System):
         x_th_limits = self._parameters["x_th_limits"]
         # # If real throttle position out of bounds - 
         # # end throttle movement and set in bounds
+        # x_th = np.clip(x_th, x_th_limits[0], x_th_limits[1])
         x_th = rg.if_else(x_th > x_th_limits[0], x_th, x_th_limits[0])
         x_th = rg.if_else(x_th < x_th_limits[1], x_th, x_th_limits[1])
+        
+        # x_th_act = np.clip(inputs[0], x_th_limits[0], x_th_limits[1])
         x_th_act = inputs[0]
+        # x_th_act = rg.if_else(
+        #     x_th_act > x_th_limits[0], x_th_act, x_th_limits[0]
+        # )
+        # x_th_act = rg.if_else(
+        #     x_th_act < x_th_limits[1], x_th_act, x_th_limits[1]
+        # )
         
         # HYDRAULIC FORCE
         A_hydr, A_work = self._parameters["A_hydr"], self._parameters["A_work"]
@@ -252,6 +283,11 @@ class HydraulicSystem(System):
         )
         
         # # FRICTION FORCE
+        # if v_p != 0:
+        #     F_friction = - np.sign(v_p) * max(F_coulomb, (1-eta)*F_hydr)
+        # else:
+        #     F_friction = - np.sign(F_g + F_hydr) * F_coulomb
+        
         F_fr_hydr = (1-eta)*F_hydr
         # If piston moves
         F_fr_dynamic = -rg.sign(v_p) * rg.if_else(
@@ -265,6 +301,12 @@ class HydraulicSystem(System):
         F_friction = rg.if_else(v_p != 0, F_fr_dynamic, F_fr_static)
             
         # # ACCELERATION
+        # if (abs(v_p) > 0) or (abs(F_hydr + F_g) > abs(F_friction)):
+        #     acceleration = (g + 1/m_p * (F_hydr + F_friction))*1e6
+        # else:
+        #     # if piston does not move and acting force lower than friction
+        #     acceleration = 0
+        
         cond_velocity = rg.if_else(
             v_p != 0,
             1,
@@ -299,12 +341,7 @@ class HydraulicSystem(System):
             self._parameters["B_th"],
             self._parameters["K_hydr"],
         )
-        Dstate[3] = (
-            K_hydr*(
-                rg.sign(p_l - p_hydr)*B_th*x_th*rg.abs(p_l - p_hydr)**(1/2)
-                - v_p
-            ) / x_p
-        )
+        Dstate[3] = K_hydr*(rg.sign(p_l - p_hydr)*B_th*x_th*rg.abs(p_l - p_hydr)**(1/2) - v_p) / x_p
         
         # \dot{p_work}
         x_p_init = self.init_state[0]
@@ -314,12 +351,7 @@ class HydraulicSystem(System):
             self._parameters["K_work"],
             self._parameters["h_work_init"],
         )
-        Dstate[4] = (
-            K_work*(
-                v_p 
-                - rg.sign(p_work - p_atm)*B_exit*rg.abs(p_work - p_atm)**(1/2)
-            )/(h_work_init - x_p + x_p_init)
-        )
+        Dstate[4] = K_work * (v_p - rg.sign(p_work - p_atm)*B_exit*rg.abs(p_work - p_atm)**(1/2))/(h_work_init - x_p + x_p_init)
         
         return Dstate
     
@@ -338,11 +370,17 @@ class HydraulicSystem(System):
         Returns:
             observation (jet length, jet velocity)
         """
+        # # Check that initial state was set
+        # if self.init_state is None:
+        #     self.init_state = np.copy(state)
         
         observation = rg.zeros(
             self.dim_observation,
             prototype=state,
         )
+        # observation = np.zeros(
+        #     self.dim_observation,
+        # )
         
         # Current and init state parameters
         x_p = state[0]
@@ -380,97 +418,14 @@ class HydraulicSystem(System):
 
             return observation
         
-
-
-class HydraulicSystemNumpy(HydraulicSystem):
     
-    def _compute_state_dynamics(self, time, state, inputs):
-        
-        # Check that initial state was set
-        if self.init_state is None:
-            self.init_state = np.copy(state)
-        
-        Dstate = np.zeros(
-            self.dim_state,
-        )
-        
-        # Get current state parameters
-        x_p, v_p, x_th, p_hydr, p_work = [
-            state[i] for i in range(self.dim_state)
-        ]
-        
-        # CLIP THROTTLE POSITION
-        x_th_limits = self._parameters["x_th_limits"]
-        # If real throttle position out of bounds - 
-        # end throttle movement and set in bounds
-        x_th = np.clip(x_th, x_th_limits[0], x_th_limits[1])
-        # x_th_act = np.clip(inputs[0], x_th_limits[0], x_th_limits[1])
-        x_th_act = inputs[0]
-        
-        # HYDRAULIC FORCE
-        A_hydr, A_work = self._parameters["A_hydr"], self._parameters["A_work"]
-        F_hydr = A_hydr*p_hydr - A_work*p_work
-        
-        # Required dynamic parameters
-        F_coulomb, eta, F_g, g, m_p = (
-            self._parameters["F_coulomb"],
-            self._parameters["eta"],
-            self._parameters["F_g"],
-            self._parameters["g"],
-            self._parameters["m_p"],
-        )
-        
-        # FRICTION FORCE
-        if v_p != 0:
-            F_friction = - np.sign(v_p) * max(F_coulomb, (1-eta)*F_hydr)
-        else:
-            F_friction = - np.sign(F_g + F_hydr) * F_coulomb
-            
-        # ACCELERATION
-        if (abs(v_p) > 0) or (abs(F_hydr + F_g) > abs(F_friction)):
-            acceleration = (g + 1/m_p * (F_hydr + F_friction))*1e6
-        else:
-            # if piston does not move and acting force lower than friction
-            acceleration = 0
-        
-        # RHS
-        # \dot{x_p}
-        Dstate[0] = state[1]
-        
-        # \dot{v_p}
-        Dstate[1] = acceleration
-        
-        # \dot{x_th}
-        freq_th = self._parameters["freq_th"]
-        Dstate[2] = freq_th * (x_th_act - x_th)
-        
-        # \dot{p_hydr}
-        p_l, B_th, K_hydr = (
-            self._parameters["p_l"],
-            self._parameters["B_th"],
-            self._parameters["K_hydr"],
-        )
-        Dstate[3] = (
-            K_hydr*(
-                np.sign(p_l - p_hydr)*B_th*x_th*abs(p_l - p_hydr)**(1/2) - v_p
-            ) / x_p
-        )
-        
-        # \dot{p_work}
-        x_p_init = self.init_state[0]
-        p_atm, B_exit, K_work, h_work_init = (
-            self._parameters["p_atm"],
-            self._parameters["B_exit"],
-            self._parameters["K_work"],
-            self._parameters["h_work_init"],
-        )
-        Dstate[4] = (
-            K_work*(
-                v_p - np.sign(p_work - p_atm)*B_exit*abs(p_work - p_atm)**(1/2)
-            )/(h_work_init - x_p + x_p_init)
-        )
-        
-        return Dstate
-    
-    def compute_closed_loop_rhs(self, time, state):
-        return self._compute_state_dynamics(time, state, self.inputs)
+# if __name__ == '__main__': 
+#     system = detach(HydraulicSystemRg)()
+#     Dstate = system._compute_state_dynamics(
+#         0,
+#         np.array(
+#             [1e3, 0, 10, 1e5, 1e5]
+#         ),
+#         inputs=np.array([10])
+#     )
+#     print(Dstate)
