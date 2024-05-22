@@ -123,11 +123,7 @@ class SciPyIvpHistory(SciPyIvp):
         self.state_history[-1].append(action[0])
         self.system.receive_action(action)
 
-    @property
-    def state(self):
-        return self._state
-
-    @state.setter
+    @SciPyIvp.state.setter
     def state(self, new_state):
         # print(new_state, self.time)
         try:
