@@ -1,9 +1,10 @@
 import regelum
-from regelum.callback import HistoricalCallback, disable_in_jupyter
+from regelum.callback import Callback, HistoricalCallback, disable_in_jupyter
 
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import regelum.simulator
 
 class HistoricalDataCallback(HistoricalCallback):
     """A callback which allows to store desired data collected among different runs inside multirun execution runtime."""
@@ -135,3 +136,44 @@ class HistoricalDataCallback(HistoricalCallback):
             ax.set_ylabel(label)
 
         return axes[0].figure
+    
+    
+
+class SimulatorStepLogger(Callback):
+    """Records the state of the simulated system into `self.system_state`.
+
+    Useful for animations that visualize motion of dynamical systems.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.times = []
+        self.system_states = []
+        self.observations = []
+
+    def is_target_event(self, obj, method, output, triggers):
+        return (
+            isinstance(obj, regelum.simulator.Simulator)
+            and method == "get_sim_step_data"
+        )
+
+    def is_done_collecting(self):
+        return hasattr(self, "system_state")
+
+    def on_function_call(self, obj, method, output):
+        # self.system_state = obj.state
+        # TIME
+        self.times.append(output[0])
+
+        # STATE
+        system_state = output[1]
+        system_state = system_state.reshape(system_state.size)
+        # self.state_naming = obj.simulator.system.state_naming
+        self.state_naming = obj.system.state_naming
+        self.system_states.append(system_state)
+        
+        # OBSERVATION
+        observation = output[2]
+        observation = observation.reshape(observation.size)
+        self.observation_naming = obj.system.observation_naming
+        self.observations.append(observation)
