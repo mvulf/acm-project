@@ -11,7 +11,8 @@ class HydraulicSystem(System):
     _system_type = 'diff_eqn'
     _dim_state = 5
     _dim_inputs = 1
-    _dim_observation = 4
+    # _dim_observation = 4
+    _dim_observation = 2
     _state_naming = [
         "piston position [µm]", 
         "piston velocity [µm/s]", 
@@ -22,8 +23,8 @@ class HydraulicSystem(System):
     _observation_naming = [
         "jet length [mm]", 
         "jet velocity [mm/s]",
-        "hydraulic pressure [Pa]",
-        "working pressure [Pa]",
+        # "hydraulic pressure [Pa]",
+        # "working pressure [Pa]",
     ]
     _inputs_naming = ["throttle action [µm]"]
     _action_bounds = [[-20.0, 20.0]]
@@ -368,9 +369,9 @@ class HydraulicSystem(System):
             1e-3 * v_p * D_work_exit_2_ratio
         )
         
-        # Pressures
-        observation[2] = p_hydr
-        observation[3] = p_work
+        # # Pressures
+        # observation[2] = p_hydr
+        # observation[3] = p_work
         
         return observation
         
@@ -389,16 +390,139 @@ class HydraulicSystem(System):
                 scale=self._parameters["jet_velocity_std"]
             )
             
-            # Pressures with noise
-            observation[2] += np.random.normal(
-                scale=self._parameters["pressure_std"]
-            )
-            observation[3] += np.random.normal(
-                scale=self._parameters["pressure_std"]
-            )
+            # # Pressures with noise
+            # observation[2] += np.random.normal(
+            #     scale=self._parameters["pressure_std"]
+            # )
+            # observation[3] += np.random.normal(
+            #     scale=self._parameters["pressure_std"]
+            # )
 
             return observation
         
+
+class HydraulicSystemStationary(HydraulicSystem):
+    _name = 'HydraulicSystemStationary'
+    _system_type = 'diff_eqn'
+    # _dim_state = 2
+    _dim_state = 1
+    _dim_inputs = 1
+    _dim_observation = 2
+    _state_naming = [
+        "piston position [µm]",
+        "piston velocity [µm/s]",
+    ]
+    _observation_naming = [
+        "jet length [mm]", 
+        "jet velocity [mm/s]",
+    ]
+    
+    def _compute_state_dynamics(self, time, state, inputs):
+        
+        Dstate = rg.zeros(
+            self.dim_state,
+            prototype=(state, inputs),
+        )
+        
+        # x_p, v_p = state[0], state[1] # TODO: Check without v_p
+        x_p = state[0] # TODO: Check without v_p
+        v_p = 1
+        
+        # CLIP THROTTLE POSITION
+        x_th_limits = self._parameters["x_th_limits"]
+        x_th = inputs[0]
+        # # If real throttle position out of bounds - 
+        # # end throttle movement and set in bounds
+        x_th = rg.if_else(x_th > x_th_limits[0], x_th, x_th_limits[0])
+        x_th = rg.if_else(x_th < x_th_limits[1], x_th, x_th_limits[1])
+        
+        A_hydr, A_work = self._parameters["A_hydr"], self._parameters["A_work"]
+        
+        # Required dynamic parameters
+        F_coulomb, eta, F_g, g, m_p = (
+            self._parameters["F_coulomb"],
+            self._parameters["eta"],
+            self._parameters["F_g"],
+            self._parameters["g"],
+            self._parameters["m_p"],
+        )
+        
+        p_l, B_th, K_hydr = (
+            self._parameters["p_l"],
+            self._parameters["B_th"],
+            self._parameters["K_hydr"],
+        )
+        
+        p_atm, B_exit, K_work, h_work_init = (
+            self._parameters["p_atm"],
+            self._parameters["B_exit"],
+            self._parameters["K_work"],
+            self._parameters["h_work_init"],
+        )
+        
+        F_hydr = m_p*g/(rg.sign(v_p)*(1-eta)-1)
+        
+        F_hydr = rg.if_else(
+            (1-eta)*F_hydr>F_coulomb,
+            F_hydr,
+            rg.sign(v_p)*F_coulomb - m_p*g
+        )
+        
+        B_action = (x_th*B_th/B_exit)**2
+        
+        p_hydr = (
+            (F_hydr + p_atm*A_work + p_l*A_work*B_action)
+            / (A_hydr + A_work*B_action)
+        )
+        
+        v_p = rg.sign(p_l - p_hydr)*B_th*x_th*(rg.abs(p_l - p_hydr))**(1/2)
+        
+        Dstate[0] = v_p
+        
+        return Dstate
+
+
+    def _get_observation(self, time, state, inputs):
+        """Get observations 
+        (relative jet length and relative jet velocity), without sensors noise
+        Assumption: volume flow rates for working container and jet are the same
+
+        Args:
+            state: system state
+
+        Returns:
+            observation (jet length, jet velocity)
+        """
+        
+        observation = rg.zeros(
+            self.dim_observation,
+            prototype=state,
+        )
+        
+        x_p = state[0]
+
+        v_p = self._compute_state_dynamics(
+            time=time,
+            state=state,
+            inputs=inputs
+        )[0]
+
+        x_p_init = self.init_state[0]
+        
+        D_work_exit_2_ratio = self._parameters["D_work_exit_2_ratio"]
+        
+        # Jet length
+        observation[0] = (
+            1e-3 * (x_p - x_p_init) * D_work_exit_2_ratio
+        )
+        
+        # Jet velocity
+        observation[1] = (
+            1e-3 * v_p * D_work_exit_2_ratio
+        )
+        
+        return observation
+
 
 class HydraulicSystemModel(HydraulicSystem):
     _dim_state=4

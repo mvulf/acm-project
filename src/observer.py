@@ -5,6 +5,37 @@ from regelum.utils import rg
 
 from src.system import HydraulicSystem
 
+
+class HydraulicStationaryObserver(Observer):
+    def __init__(
+        self,
+        system: HydraulicSystem
+    ):
+        self.x_p_init = system.init_state[0]
+        self.x_th_limits = system._parameters["x_th_limits"]
+        self.D_work_exit_2_ratio = system._parameters["D_work_exit_2_ratio"]
+        
+        
+    def get_state_estimation(self, t, observation, action):
+        observation = observation.flatten()
+        # Get observation parameters
+        x_jet, v_jet = observation[0], observation[1]
+        
+        x_p = 1e3*x_jet/self.D_work_exit_2_ratio + self.x_p_init
+        v_p = 1e3*v_jet/self.D_work_exit_2_ratio
+        
+        # state_estimation = rg.array(
+        #     [[x_p, v_p]],
+        #     prototype=observation
+        # )
+        state_estimation = rg.array(
+            [[x_p]],
+            prototype=observation
+        )
+        
+        return state_estimation
+
+
 class HydraulicObserver(Observer):
     
     def __init__(
