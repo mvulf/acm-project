@@ -433,8 +433,8 @@ class HydraulicSystemStationary(HydraulicSystem):
         x_th = inputs[0]
         # # If real throttle position out of bounds - 
         # # end throttle movement and set in bounds
-        x_th = rg.if_else(x_th > x_th_limits[0], x_th, x_th_limits[0])
-        x_th = rg.if_else(x_th < x_th_limits[1], x_th, x_th_limits[1])
+        # x_th = rg.if_else(x_th > x_th_limits[0], x_th, x_th_limits[0])
+        # x_th = rg.if_else(x_th < x_th_limits[1], x_th, x_th_limits[1])
         
         A_hydr, A_work = self._parameters["A_hydr"], self._parameters["A_work"]
         
