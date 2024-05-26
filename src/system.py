@@ -399,489 +399,6 @@ class HydraulicSystem(System):
             # )
 
             return observation
-        
-
-class HydraulicSystemStationary(HydraulicSystem):
-    _name = 'HydraulicSystemStationary'
-    _system_type = 'diff_eqn'
-    _dim_state = 3
-    # _dim_state = 1
-    _dim_inputs = 1
-    _dim_observation = 2
-    _state_naming = [
-        "piston position [µm]",
-        "piston velocity [µm/s]",
-    ]
-    _observation_naming = [
-        "jet length [mm]", 
-        "jet velocity [mm/s]",
-    ]
-    
-    _action_bounds = [[-20.0, 20.0]]
-    
-    def _compute_state_dynamics_old(self, time, state, inputs):
-        
-        Dstate = rg.zeros(
-            self.dim_state,
-            prototype=(state, inputs),
-        )
-        
-        x_p, v_p = state[0], state[1] # TODO: Check without v_p
-        # x_p = state[0] # TODO: Check without v_p
-        # v_p = 1
-        
-        # CLIP THROTTLE POSITION
-        x_th_limits = self._parameters["x_th_limits"]
-        x_th = inputs[0]
-        # # If real throttle position out of bounds - 
-        # # end throttle movement and set in bounds
-        # x_th = rg.if_else(x_th > x_th_limits[0], x_th, x_th_limits[0])
-        # x_th = rg.if_else(x_th < x_th_limits[1], x_th, x_th_limits[1])
-        
-        A_hydr, A_work = self._parameters["A_hydr"], self._parameters["A_work"]
-        
-        # Required dynamic parameters
-        F_coulomb, eta, F_g, g, m_p = (
-            self._parameters["F_coulomb"],
-            self._parameters["eta"],
-            self._parameters["F_g"],
-            self._parameters["g"],
-            self._parameters["m_p"],
-        )
-        
-        p_l, B_th, K_hydr = (
-            self._parameters["p_l"],
-            self._parameters["B_th"],
-            self._parameters["K_hydr"],
-        )
-        
-        p_atm, B_exit, K_work, h_work_init = (
-            self._parameters["p_atm"],
-            self._parameters["B_exit"],
-            self._parameters["K_work"],
-            self._parameters["h_work_init"],
-        )
-        
-        F_hydr = m_p*g/(rg.sign(v_p)*(1-eta)-1)
-        
-        F_hydr = rg.if_else(
-            (1-eta)*F_hydr>F_coulomb,
-            F_hydr,
-            rg.sign(v_p)*F_coulomb - m_p*g
-        )
-        
-        B_action = (x_th*B_th/B_exit)**2
-        
-        p_hydr = (
-            (F_hydr + p_atm*A_work + p_l*A_work*B_action)
-            / (A_hydr + A_work*B_action)
-        )
-        
-        v_p = rg.sign(p_l - p_hydr)*B_th*x_th*(rg.abs(p_l - p_hydr))**(1/2)
-        
-        v_p = rg.if_else(
-            x_th > 0,
-            v_p,
-            1e-6*v_p
-        )
-        
-        Dstate[0] = v_p
-        
-        return Dstate
-    
-    
-    def _compute_state_dynamics(self, time, state, inputs):
-        
-        Dstate = rg.zeros(
-            self.dim_state,
-            prototype=(state, inputs),
-        )
-        
-        x_p, v_p, x_th = state[0], state[1], state[2] # TODO: Check without v_p
-
-        x_th_act = inputs[0]
-        
-        A_hydr, A_work = self._parameters["A_hydr"], self._parameters["A_work"]
-        
-        # Required dynamic parameters
-        F_coulomb, eta, F_g, g, m_p = (
-            self._parameters["F_coulomb"],
-            self._parameters["eta"],
-            self._parameters["F_g"],
-            self._parameters["g"],
-            self._parameters["m_p"],
-        )
-        
-        p_l, B_th, K_hydr = (
-            self._parameters["p_l"],
-            self._parameters["B_th"],
-            self._parameters["K_hydr"],
-        )
-        
-        p_atm, B_exit, K_work, h_work_init = (
-            self._parameters["p_atm"],
-            self._parameters["B_exit"],
-            self._parameters["K_work"],
-            self._parameters["h_work_init"],
-        )
-        
-        F_hydr = m_p*g/(rg.sign(v_p)*(1-eta)-1)
-        
-        F_hydr = rg.if_else(
-            (1-eta)*F_hydr>F_coulomb,
-            F_hydr,
-            rg.sign(v_p)*F_coulomb - m_p*g
-        )
-        
-        # # Pressure estimation by piston velocity
-        # p_hydr_v_p = (F_hydr + A_work*((v_p/B_exit)**2 + p_atm))/A_hydr
-        # # Throttle position estimation
-        # x_th = (
-        #     v_p
-        #     /(rg.sign(p_l - p_hydr_v_p)*B_th*(rg.abs(p_l - p_hydr_v_p))**(1/2))
-        # )
-        
-        B_action = (x_th*B_th/B_exit)**2
-        
-        p_hydr = (
-            (F_hydr + p_atm*A_work + p_l*A_work*B_action)
-            / (A_hydr + A_work*B_action)
-        )
-        
-        v_p = rg.sign(p_l - p_hydr)*B_th*x_th*(rg.abs(p_l - p_hydr))**(1/2)
-        
-        v_p = rg.if_else(
-            x_th > 0,
-            v_p,
-            1e-10*v_p
-        )
-        
-        Dstate[0] = v_p
-        # \dot{x_th}
-        freq_th = self._parameters["freq_th"]
-        Dstate[2] = freq_th * (x_th_act - x_th)
-        
-        return Dstate
-
-
-    def _get_observation(self, time, state, inputs):
-        """Get observations 
-        (relative jet length and relative jet velocity), without sensors noise
-        Assumption: volume flow rates for working container and jet are the same
-
-        Args:
-            state: system state
-
-        Returns:
-            observation (jet length, jet velocity)
-        """
-        
-        observation = rg.zeros(
-            self.dim_observation,
-            prototype=state,
-        )
-        
-        x_p = state[0]
-
-        v_p = self._compute_state_dynamics(
-            time=time,
-            state=state,
-            inputs=inputs
-        )[0]
-
-        x_p_init = self.init_state[0]
-        
-        D_work_exit_2_ratio = self._parameters["D_work_exit_2_ratio"]
-        
-        # Jet length
-        observation[0] = (
-            1e-3 * (x_p - x_p_init) * D_work_exit_2_ratio
-        )
-        
-        # Jet velocity
-        observation[1] = (
-            1e-3 * v_p * D_work_exit_2_ratio
-        )
-        
-        return observation
-
-
-class HydraulicSystemModel(HydraulicSystem):
-    _dim_state=4
-    _state_naming = [
-        "piston position [µm]", 
-        "piston velocity [µm/s]", 
-        "hydraulic pressure [Pa]",
-        "working pressure [Pa]",
-    ]
-    
-    # def _compute_state_dynamics(self, time, state, inputs):
-        
-    #     Dstate = rg.zeros(
-    #         self.dim_state,
-    #         prototype=(state, inputs),
-    #     )
-        
-    #     # Get current state parameters
-    #     x_p, v_p, p_hydr, p_work = [
-    #         state[i] for i in range(self.dim_state)
-    #     ]
-
-    #     x_th_act = inputs[0]
-    #     x_th_limits = self._parameters["x_th_limits"]
-    #     # # If real throttle position out of bounds - 
-    #     # # end throttle movement and set in bounds
-    #     x_th_act = rg.if_else(x_th_act > x_th_limits[0], x_th_act, x_th_limits[0])
-    #     x_th_act = rg.if_else(x_th_act < x_th_limits[1], x_th_act, x_th_limits[1])
-        
-        
-    #     # HYDRAULIC FORCE
-    #     A_hydr, A_work = self._parameters["A_hydr"], self._parameters["A_work"]
-    #     F_hydr = A_hydr*p_hydr - A_work*p_work
-        
-    #     # Required dynamic parameters
-    #     F_coulomb, eta, F_g, g, m_p = (
-    #         self._parameters["F_coulomb"],
-    #         self._parameters["eta"],
-    #         self._parameters["F_g"],
-    #         self._parameters["g"],
-    #         self._parameters["m_p"],
-    #     )
-        
-    #     # # FRICTION FORCE
-    #     F_fr_hydr = (1-eta)*F_hydr
-    #     # If piston moves
-    #     F_fr_dynamic = -rg.sign(v_p) * rg.if_else(
-    #         F_coulomb > F_fr_hydr,
-    #         F_coulomb,
-    #         F_fr_hydr
-    #     )
-    #     # If piston does not move
-    #     F_fr_static = -rg.sign(F_g + F_hydr) * F_coulomb
-        
-    #     F_friction = rg.if_else(v_p != 0, F_fr_dynamic, F_fr_static)
-            
-    #     # # ACCELERATION
-    #     cond_velocity = rg.if_else(
-    #         v_p != 0,
-    #         1,
-    #         0
-    #     )
-    #     cond_fr_overcome = rg.if_else(
-    #         rg.abs(F_hydr + F_g) > rg.abs(F_friction),
-    #         1,
-    #         0
-    #     )
-    #     # return 0, if piston does not move and acting force lower than friction
-    #     acceleration = rg.if_else(
-    #         (cond_velocity + cond_fr_overcome) > 0, # OR
-    #         1e6*(g + 1/m_p * (F_hydr + F_friction)),
-    #         0
-    #     )
-        
-    #     # RHS
-    #     # \dot{x_p}
-    #     Dstate[0] = state[1]
-        
-    #     # \dot{v_p}
-    #     Dstate[1] = acceleration
-        
-    #     # # \dot{x_th}
-    #     # freq_th = self._parameters["freq_th"]
-    #     # Dstate[2] = freq_th * (x_th_act - x_th)
-        
-    #     # \dot{p_hydr}
-    #     p_l, B_th, K_hydr = (
-    #         self._parameters["p_l"],
-    #         self._parameters["B_th"],
-    #         self._parameters["K_hydr"],
-    #     )
-    #     Dstate[2] = (
-    #         K_hydr*(
-    #             rg.sign(p_l - p_hydr)*B_th*x_th_act*rg.abs(p_l - p_hydr)**(1/2)
-    #             - v_p
-    #         ) / x_p
-    #     )
-        
-    #     # \dot{p_work}
-    #     x_p_init = self.init_state[0]
-    #     p_atm, B_exit, K_work, h_work_init = (
-    #         self._parameters["p_atm"],
-    #         self._parameters["B_exit"],
-    #         self._parameters["K_work"],
-    #         self._parameters["h_work_init"],
-    #     )
-    #     Dstate[3] = (
-    #         K_work*(
-    #             v_p 
-    #             - rg.sign(p_work - p_atm)*B_exit*rg.abs(p_work - p_atm)**(1/2)
-    #         )/(h_work_init - x_p + x_p_init)
-    #     )
-        
-    #     return Dstate
-    
-    
-    def _compute_state_dynamics(self, time, state, inputs):
-        
-        Dstate = rg.zeros(
-            self.dim_state,
-            prototype=(state, inputs),
-        )
-        
-        # Get current state parameters
-        x_p, v_p, p_hydr, p_work = [
-            state[i] for i in range(self.dim_state)
-        ]
-
-        x_th_act = inputs[0]
-        x_th_limits = self._parameters["x_th_limits"]
-        # # If real throttle position out of bounds - 
-        # # end throttle movement and set in bounds
-        # x_th_act = rg.if_else(x_th_act > x_th_limits[0], x_th_act, x_th_limits[0])
-        # x_th_act = rg.if_else(x_th_act < x_th_limits[1], x_th_act, x_th_limits[1])
-        
-        
-        # HYDRAULIC FORCE
-        A_hydr, A_work = self._parameters["A_hydr"], self._parameters["A_work"]
-        F_hydr = A_hydr*p_hydr - A_work*p_work
-        
-        # Required dynamic parameters
-        F_coulomb, eta, F_g, g, m_p = (
-            self._parameters["F_coulomb"],
-            self._parameters["eta"],
-            self._parameters["F_g"],
-            self._parameters["g"],
-            self._parameters["m_p"],
-        )
-        
-        # # FRICTION FORCE
-        F_fr_hydr = (1-eta)*F_hydr
-        # # If piston moves
-        # F_fr_dynamic = -rg.sign(v_p) * rg.if_else(
-        #     F_coulomb > F_fr_hydr,
-        #     F_coulomb,
-        #     F_fr_hydr
-        # )
-        # # If piston does not move
-        # F_fr_static = -rg.sign(F_g + F_hydr) * F_coulomb
-        
-        # F_friction = rg.if_else(v_p != 0, F_fr_dynamic, F_fr_static)
-        F_friction = F_fr_hydr
-            
-        # # ACCELERATION
-        # cond_velocity = rg.if_else(
-        #     v_p != 0,
-        #     1,
-        #     0
-        # )
-        # cond_fr_overcome = rg.if_else(
-        #     rg.abs(F_hydr + F_g) > rg.abs(F_friction),
-        #     1,
-        #     0
-        # )
-        # return 0, if piston does not move and acting force lower than friction
-        # acceleration = rg.if_else(
-        #     (cond_velocity + cond_fr_overcome) > 0, # OR
-        #     1e6*(g + 1/m_p * (F_hydr + F_friction)),
-        #     0
-        # )
-        
-        acceleration = 1e6*(g + 1/m_p * (F_hydr + F_friction))
-        
-        # RHS
-        # \dot{x_p}
-        Dstate[0] = state[1]
-        
-        # \dot{v_p}
-        Dstate[1] = acceleration
-        
-        # # \dot{x_th}
-        # freq_th = self._parameters["freq_th"]
-        # Dstate[2] = freq_th * (x_th_act - x_th)
-        
-        # \dot{p_hydr}
-        p_l, B_th, K_hydr = (
-            self._parameters["p_l"],
-            self._parameters["B_th"],
-            self._parameters["K_hydr"],
-        )
-        # Dstate[2] = (
-        #     K_hydr*(
-        #         rg.sign(p_l - p_hydr)*B_th*x_th_act*rg.abs(p_l - p_hydr)**(1/2)
-        #         - v_p
-        #     ) / x_p
-        # )
-        
-        Dstate[2] = x_th_act
-        
-        # \dot{p_work}
-        x_p_init = self.init_state[0]
-        p_atm, B_exit, K_work, h_work_init = (
-            self._parameters["p_atm"],
-            self._parameters["B_exit"],
-            self._parameters["K_work"],
-            self._parameters["h_work_init"],
-        )
-        # Dstate[3] = (
-        #     K_work*(
-        #         v_p 
-        #         - rg.sign(p_work - p_atm)*B_exit*rg.abs(p_work - p_atm)**(1/2)
-        #     )/(h_work_init - x_p + x_p_init)
-        # )
-        
-        Dstate[3] = (
-            K_work*(
-                v_p 
-                - B_exit*(1.01*p_work - p_atm)**(1/2)
-            )/(h_work_init - x_p + x_p_init)
-        )
-        
-        return Dstate
-    
-    def get_clean_observation(self, state):
-        """Get clean observations 
-        (relative jet length and relative jet velocity), without sensors noise
-        Assumption: volume flow rates for working container and jet are the same
-
-        Args:
-            state: system state
-
-        Returns:
-            observation (jet length, jet velocity)
-        """
-        
-        observation = rg.zeros(
-            self.dim_observation,
-            prototype=state,
-        )
-        
-        # Current and init state parameters
-        # Get current state parameters
-        x_p, v_p, p_hydr, p_work = [
-            state[i] for i in range(self.dim_state)
-        ]
-        x_p_init = self.init_state[0]
-        
-        D_work_exit_2_ratio = self._parameters["D_work_exit_2_ratio"]
-        
-        # Jet length
-        observation[0] = (
-            1e-3 * (x_p - x_p_init) * D_work_exit_2_ratio
-        )
-        
-        # Jet velocity
-        observation[1] = (
-            1e-3 * v_p * D_work_exit_2_ratio
-        )
-        
-        # Pressures
-        observation[2] = p_hydr
-        observation[3] = p_work
-        
-        return observation
-    
-    def _get_observation(self, time, state, inputs):
-        return self.get_clean_observation(state)
 
 
 class HydraulicSystemNumpy(HydraulicSystem):
@@ -976,3 +493,120 @@ class HydraulicSystemNumpy(HydraulicSystem):
     
     def compute_closed_loop_rhs(self, time, state):
         return self._compute_state_dynamics(time, state, self.inputs)
+        
+
+class StationaryHydraulicSystem(HydraulicSystem):
+    _name = 'StationaryHydraulicSystem'
+    _system_type = 'diff_eqn'
+    _dim_state = 3
+    _dim_inputs = 1
+    _dim_observation = 2
+    _state_naming = [
+        "piston position [µm]",
+        "piston velocity [µm/s]",
+    ]
+    _observation_naming = [
+        "jet length [mm]", 
+        "jet velocity [mm/s]",
+    ]
+    
+    _action_bounds = [[-20.0, 20.0]]
+    
+    def _compute_state_dynamics(self, time, state, inputs):
+        
+        Dstate = rg.zeros(
+            self.dim_state,
+            prototype=(state, inputs),
+        )
+        
+        x_p, v_p, x_th = state[0], state[1], state[2]
+
+        x_th_act = inputs[0]
+        
+        A_hydr, A_work = self._parameters["A_hydr"], self._parameters["A_work"]
+        
+        # Required dynamic parameters
+        F_coulomb, eta, g, m_p = (
+            self._parameters["F_coulomb"],
+            self._parameters["eta"],
+            self._parameters["g"],
+            self._parameters["m_p"],
+        )
+        p_l, p_atm, B_th, B_exit = (
+            self._parameters["p_l"],
+            self._parameters["p_atm"],
+            self._parameters["B_th"],
+            self._parameters["B_exit"],
+        )
+        
+        F_hydr = m_p*g/(rg.sign(v_p)*(1-eta)-1)
+        
+        F_hydr = rg.if_else(
+            (1-eta)*F_hydr>F_coulomb,
+            F_hydr,
+            rg.sign(v_p)*F_coulomb - m_p*g
+        )
+        
+        B_action = (x_th*B_th/B_exit)**2
+        
+        p_hydr = (
+            (F_hydr + p_atm*A_work + p_l*A_work*B_action)
+            / (A_hydr + A_work*B_action)
+        )
+        
+        v_p = rg.sign(p_l - p_hydr)*B_th*x_th*(rg.abs(p_l - p_hydr))**(1/2)
+        
+        v_p = rg.if_else(
+            x_th > 0,
+            v_p,
+            1e-10*v_p # Since just zero cannot be differentiable
+        )
+        
+        Dstate[0] = v_p
+        # \dot{x_th}
+        freq_th = self._parameters["freq_th"]
+        Dstate[2] = freq_th * (x_th_act - x_th)
+        
+        return Dstate
+
+
+    def _get_observation(self, time, state, inputs):
+        """Get observations 
+        (relative jet length and relative jet velocity), without sensors noise
+        Assumption: volume flow rates for working container and jet are the same
+
+        Args:
+            state: system state
+
+        Returns:
+            observation (jet length, jet velocity)
+        """
+        
+        observation = rg.zeros(
+            self.dim_observation,
+            prototype=state,
+        )
+        
+        x_p = state[0]
+
+        v_p = self._compute_state_dynamics(
+            time=time,
+            state=state,
+            inputs=inputs
+        )[0]
+
+        x_p_init = self.init_state[0]
+        
+        D_work_exit_2_ratio = self._parameters["D_work_exit_2_ratio"]
+        
+        # Jet length
+        observation[0] = (
+            1e-3 * (x_p - x_p_init) * D_work_exit_2_ratio
+        )
+        
+        # Jet velocity
+        observation[1] = (
+            1e-3 * v_p * D_work_exit_2_ratio
+        )
+        
+        return observation

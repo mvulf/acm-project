@@ -666,7 +666,7 @@ from regelum.system import SystemWithConstantReference
 class HydraulicSystemReference(SystemWithConstantReference):
     
     def __init__(self, init_state):
-        """Instantiate TwoTankReferenced."""
+        """Instantiate Referenced system"""
         super().__init__(
             system=HydraulicSystem(init_state=init_state), 
             state_reference=np.array([
