@@ -177,10 +177,24 @@ $v_ \text{j} = 0.2\cdot 10^3 [\text{mm/s}]$ is jet velocity (empirically estimat
 coefficients $10^{6}$ and $10^{3}$ appear since jet velocity is in mm/s.
 Other values are in SI.
 
+Research of pneumatic DoD generator, conducted by Cheng and Changra [[3](https://doi.org/10.1007/S00348-003-0629-6)], showed that jet critical length estimation may be used also as the single droplet detaching criterion: droplet detaches from jet if $x_ \text{jet} \geq l_ \text{crit}$.
+However, Cheng and Changra [[3](https://doi.org/10.1007/S00348-003-0629-6)] noticed that the longer the jet length, the more satellites are formed.
+Thus, our control goal is as follows:
+
+$$
+\begin{equation}
+    x_ \text{jet} \searrow l_ \text{crit}
+\end{equation}
+$$
+
+This means that the jet length should be above the critical jet length, but converge to it.
+
 ### Observations
 TODO
+
 ### Running cost
 TODO
+
 ---
 
 ## Results
@@ -226,13 +240,15 @@ ___
 ```bash
 python main.py
 ```
-___
-Open [main.ipynb](./main.ipynb) and 'Run All'
+
+To see full research please open [main.ipynb](./main.ipynb) and 'Run All'
 
 ---
 
 ## Bibliography
 
-[[1](https://doi.org/10.3390/coatings13010129)] M.Vulf,V.Petrov,A.Sulimov,A.Simonova,A.Kazak,S.Chugunov, and D. Kolomenskiy, “A novel droplet generator and a bench-testing rig enabling research on suspension droplet wall impingement and particle deposition,” Coatings, vol. 13, no. 1, p. 129, jan 2023.
+[[1](https://doi.org/10.3390/coatings13010129)] M. Vulf, V. Petrov, A. Sulimov, A. Simonova, A. Kazak, S. Chugunov, and D. Kolomenskiy, “A novel droplet generator and a bench-testing rig enabling research on suspension droplet wall impingement and particle deposition,” Coatings, vol. 13, no. 1, p. 129, jan 2023.
 
 [[2](https://doi.org/10.1002/aic.690120411)] R. P. Grant and S. Middleman, “Newtonian jet stability,” AIChE Journal, vol. 12, no. 4, pp. 669–678, jul 1966.
+
+[[3](https://doi.org/10.1007/S00348-003-0629-6)] S. Cheng and S. Chandra, “A pneumatic droplet-on-demand generator, ” Experiments in Fluids, vol. 34, no. 6, pp. 755–762, 6 2003.
