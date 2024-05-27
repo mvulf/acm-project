@@ -56,7 +56,7 @@ $$
 
 The piston moves by the action of the gravity $(m_\text{p}g)$, hydraulic $(F_\text{hydr})$ and friction $(F_\text{fr})$ forces.
 Piston mass $m_\text{p} = 0.2\cdot 10^{-1} \text{kg}$.
-The injector tip position setting $x^\text{act}_\text{th}$ is considered as the action to the hydraulic machinery, since the injector tip position $x_\text{th}$ cannot be changed immediately:
+The injector tip position setting $x^{\text{act}}_{\text{th}}$ is considered as the action to the hydraulic machinery, since the injector tip position $x_{\text{th}}$ cannot be changed immediately:
 
 $$
 \begin{equation}
