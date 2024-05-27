@@ -247,8 +247,7 @@ Detailed explanation of the findings, performance metrics, and outcomes of the p
 
 ### Model Predictive Control (MPC)
 
-
-### Comparison
+Thus, value (or total cost) was reduced by more than $21\%$.
 
 ---
 
@@ -284,11 +283,8 @@ pip install -r requirements.txt
 
 ### Running the Code
 ___
-```bash
-python main.py
-```
 
-To see full research please open [main.ipynb](./main.ipynb) and 'Run All'
+To reproduce full research please open [main.ipynb](./main.ipynb) and `Run All`.
 
 ---
 
