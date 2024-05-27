@@ -81,21 +81,21 @@ $$
 \begin{equation}
     \begin{aligned}
         & \frac{\partial x}{\partial \tau} = \begin{cases}
-            & \dot x_\text{p} = v_\text{p}\\
-            &   \dot v_\text{p} = \begin{cases}
-                g + \frac{1}{m_\text{p}}(F_\text{hydr}(p_\text{hydr}, p_\text{work}) + F_\text{fr}(v_\text{p}, F_\text{hydr})),\\
-                \qquad \text{if } |v_\text{p}| > 0 \text{ or } |F_\text{hydr} + m_\text{p}g| > |F_\text{fr}|\\
+            & \dot x_ \text{p} = v_ \text{p}\\
+            &   \dot v_ \text{p} = \begin{cases}
+                g + \frac{1}{m_ \text{p}}(F_ \text{hydr}(p_ \text{hydr}, p_ \text{work}) + F_ \text{fr}(v_ \text{p}, F_ \text{hydr})),\\
+                \qquad \text{if } |v_ \text{p}| > 0 \text{ or } |F_ \text{hydr} + m_ \text{p}g| > |F_ \text{fr}|\\
                             0, \text{ otherwise}
             \end{cases}\\
-            & \dot x_\text{th} = f_\text{th}\cdot (x^\text{act}_\text{th} - x_\text{th})\\
-            & \dot p_\text{hydr} = K_\text{hydr} \frac{
-                \text{sign}(p_\text{l} - p_\text{hydr})B_\text{th}\hat{x}_\text{th}\sqrt{|p_\text{l} - p_\text{hydr}|} - v_\text{p}
-            }{x_\text{p}}\\
-            & \dot p_\text{work} = K_\text{work} \frac{
-                v_\text{p} - \text{sign}(p_\text{work} - p_\text{atm})B_\text{exit}\sqrt{|p_\text{work} - p_\text{atm}|}
-            }{h_\text{work0} - x_\text{p} + x_\text{p0}}\\
+            & \dot x_ \text{th} = f_ \text{th}\cdot (x^\text{act}_ \text{th} - x_ \text{th})\\
+            & \dot p_ \text{hydr} = K_ \text{hydr} \frac{
+                \text{sign}(p_ \text{l} - p_ \text{hydr})B_ \text{th}\hat{x}_\text{th}\sqrt{|p_ \text{l} - p_ \text{hydr}|} - v_ \text{p}
+            }{x_ \text{p}}\\
+            & \dot p_ \text{work} = K_ \text{work} \frac{
+                v_ \text{p} - \text{sign}(p_ \text{work} - p_ \text{atm})B_ \text{exit}\sqrt{|p_ \text{work} - p_ \text{atm}|}
+            }{h_ \text{work0} - x_ \text{p} + x_ \text{p0}}\\
         \end{cases},\\
-        & \hat{x}_\text{th} = \text{clip}_0^{x_\text{th}^\text{max}}(x_\text{th}),\\
+        & \hat{x}_ \text{th} = \text{clip}_ 0^{x_ \text{th}^\text{max}}(x_ \text{th}),\\
     \end{aligned}
 \end{equation}
 $$
