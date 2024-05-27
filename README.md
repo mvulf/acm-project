@@ -40,7 +40,7 @@ To solve this problem, an optimal control system is developing.
 
 ### State dynamics
 
-The system state parameters are the piston position $x_\text{p}~[\text{µm}]$, piston velocity $v_\text{p}~[\text{µm/s}]$, throttle position $x_\text{th}~[\text{µm}]$, hydraulic container pressure $p_\text{hydr}~[\text{Pa}]$ and working container pressure $p_\text{work}~[\text{Pa}]$:
+The system state parameters are the piston position $x_\text{p} [\text{µm}]$, piston velocity $v_\text{p} [\text{µm/s}]$, throttle position $x_\text{th} [\text{µm}]$, hydraulic container pressure $p_\text{hydr} [\text{Pa}]$ and working container pressure $p_\text{work} [\text{Pa}]$:
 $$
 \begin{equation}
     x = \begin{bmatrix}
@@ -54,7 +54,7 @@ $$
 $$
 
 The piston moves by the action of the gravity $(m_\text{p}g)$, hydraulic $(F_\text{hydr})$ and friction $(F_\text{fr})$ forces.
-Piston mass $m_\text{p} = 0.2\cdot 10^{-1}~\text{kg}$.
+Piston mass $m_\text{p} = 0.2\cdot 10^{-1} \text{kg}$.
 The injector tip position setting $x^\text{act}_\text{th}$ is considered as the action to the hydraulic machinery, since the injector tip position $x_\text{th}$ cannot be changed immediately:
 $$
 \begin{equation}
@@ -62,7 +62,7 @@ u = x^\text{act}_\text{th}
 \end{equation}
 $$
 
-Let us consider hydraulic and working containers with liquid column heights $10^{-2}~[\text{m}]$.
+Let us consider hydraulic and working containers with liquid column heights $10^{-2} [\text{m}]$.
 Then the hydrostatic pressure can be neglected.
 Movement starts when the acting force is larger than the friction force.
 The state dynamics function is thus as follows:
@@ -96,15 +96,16 @@ $$
     \end{aligned}
 \end{equation}
 $$
-where $f_\text{th}=500~\text{Hz}$ is the piezoelectric element frequency;
+where $f_\text{th}=500 \text{Hz}$ is the piezoelectric element frequency;
 $x_\text{p0}, h_\text{work0}$ are the initial piston position and the initial working liquid height respectively;
 $K_\text{hydr} = \frac{1}{\beta_{V hydr}}$ and $K_\text{work} = \frac{1}{\beta_{V work}}$ are the bulk moduluses of hydraulic and working liquids respectively. Bulk modulus is the measure of the resistance of a substence to bulk compression: $K = -V\frac{dP}{dV}$; 
 $B_\text{th}, B_\text{exit}$ are the volume flow rate coefficients:
 $$
 \begin{equation}
     \begin{aligned}
-        & B_\text{th} = 4C_\text{Dth}\frac{D_\text{th}}{D^2_\text{hydr}}\sqrt{\frac{2}{\rho_\text{hydr}}}~\left[\frac{1}{\text{m}}\cdot \sqrt{\frac{\text{m}^3}{\text{kg}}}~\right],\\
-        & B_\text{exit} = 10^6C_\text{Dexit}\frac{D^2_\text{exit}}{D^2_\text{work}}\sqrt{\frac{2}{\rho_\text{work}}} ~\left[\frac{\text{µm}}{\text{m}}\cdot \sqrt{\frac{\text{m}^3}{\text{kg}}}~\right],\\
+        & B_\text{th} = 4C_\text{Dth}\frac{D_\text{th}}{D^2_\text{hydr}}\sqrt{\frac{2}{\rho_\text{hydr}}} \left[\frac{1}{\text{m}}\cdot \sqrt{\frac{\text{m}^3}{\text{kg}}} \right],\\
+        & B_\text{exit} = 10^6C_\text{Dexit}\frac{D^2_\text{exit}}{D^2_\text{work}}\sqrt{\frac{2}{\rho_\text{work}}} \left[\frac{\text{µm}}{\text{m}}\cdot \sqrt{\frac{\text{m}^3}{\text{kg}}}
+        \right],\\
     \end{aligned}
 \end{equation}
 $$
