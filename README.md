@@ -21,7 +21,6 @@ The **goal** of this project is to create an optimal control of the droplet gene
 ---
 
 ## Problem Statement
-~~This section delves into the specifics of the challenge tackled during the project. It provides context, outlines the objectives, and discusses the significance of the problem.~~
 
 Recently Vulf et al. [[1](https://doi.org/10.3390/coatings13010129)] have developed a Drop-on-Demand droplet generator which allows to generate coarse suspension droplets in a wide range of sizes (from 0.75 to 4.40 mm). Droplet generator cut-section and hydraulic machinery system calculation scheme are introduced below.
 This kind of the droplet generator can be used in droplet-based 3D-printing processes, such as Spheroid Bioprinting, Suspension Ceramic 3D-printing etc.
@@ -40,7 +39,6 @@ However, there is a common problem that it is difficult for different liquids to
 To solve this problem, an optimal control system is developing.
 
 ### State dynamics
-~~Subsections may be added to further break down the problem, provide background information, or elaborate on specific aspects that are crucial to understanding the project's scope.~~
 
 The system state parameters are the piston position $x_\text{p}~[\text{µm}]$, piston velocity $v_\text{p}~[\text{µm/s}]$, throttle position $x_\text{th}~[\text{µm}]$, hydraulic container pressure $p_\text{hydr}~[\text{Pa}]$ and working container pressure $p_\text{work}~[\text{Pa}]$:
 $$
@@ -165,10 +163,7 @@ Subsections may be used to organize results into categories, discuss different a
 ## Run the Project
 Step-by-step instructions on how to replicate the results obtained in this project.
 
-~~This should be clear enough for someone with basic knowledge of the tools used to follow.~~
-
 ### Requirements
-~~List of prerequisites, dependencies, and environment setup necessary to run the project.~~
 
 For the following instructions it is assumed that `pyenv` is already installed and `Python 3.11` is installed in `pyenv`.
 Also, IDE like `Visual Studio Code` might also be installed.
@@ -177,13 +172,6 @@ If no, please follow `Setup`-instructions from [here](https://github.com/OdinMan
 All requirements are introduced in [requirements.txt](./requirements.txt). Please follow instructions below to satisfy them.
 
 ### Setup and Installation
-___
-~~Instructions for setting up the project environment, which may include:~~
-~~- Installing dependencies: `pip install -r requirements.txt`~~
-~~- Setting up a virtual environment~~
-~~- Running a `setup.py` or `pyproject.toml` if necessary~~
-~~- Building and running a Docker container using `Dockerfile`~~
-___
 
 Please follow the instructions to run the project:
 - Clone repository:
@@ -204,19 +192,14 @@ pip install -r requirements.txt
 
 ### Running the Code
 ___
-~~Exact commands to execute the project, such as:~~
 ```bash
 python main.py
 ```
 ___
-Open `[NAME!!!].ipynb` and 'Run All'
+Open [main.ipynb](./main.ipynb) and 'Run All'
 
 ---
 
 ## Bibliography
-~~(If applicable) This section includes references to papers, articles, and other resources that informed the project's approach and methodology.~~
-~~- Reference 1~~
-~~- Reference 2~~
-~~- Reference 3~~
 
 [[1](https://doi.org/10.3390/coatings13010129)] M.Vulf,V.Petrov,A.Sulimov,A.Simonova,A.Kazak,S.Chugunov, and D. Kolomenskiy, “A novel droplet generator and a bench-testing rig enabling research on suspension droplet wall impingement and particle deposition,” Coatings, vol. 13, no. 1, p. 129, jan 2023.
