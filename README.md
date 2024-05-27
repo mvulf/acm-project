@@ -61,7 +61,7 @@ since the injector tip position $x_ \text{th}$ cannot be changed immediately:
 
 $$
 \begin{equation}
-u = x^\text{act}_\text{th}
+    u = x^\text{act}_\text{th}
 \end{equation}
 $$
 
@@ -87,7 +87,6 @@ $$
                 \qquad \text{if } |v_\text{p}| > 0 \text{ or } |F_\text{hydr} + m_\text{p}g| > |F_\text{fr}|\\
                             0, \text{ otherwise}
             \end{cases}\\
-            
             & \dot x_\text{th} = f_\text{th}\cdot (x^\text{act}_\text{th} - x_\text{th})\\
             & \dot p_\text{hydr} = K_\text{hydr} \frac{
                 \text{sign}(p_\text{l} - p_\text{hydr})B_\text{th}\hat{x}_\text{th}\sqrt{|p_\text{l} - p_\text{hydr}|} - v_\text{p}
@@ -148,7 +147,6 @@ $$
     F_\text{fr}(v_\text{p}, F_\text{hydr}) = \begin{cases} 
         -\text{sign}(v_\text{p})\cdot \max(F_\text{C}, (1-\eta) F_\text{hydr}),\\
         \qquad \text{if } |v_\text{p}|>0\\
-        
         -\text{sign}(F_\text{hydr} + m_\text{p}g)\cdot F_\text{C},\\
         \qquad \text{otherwise }\\
     \end{cases}
