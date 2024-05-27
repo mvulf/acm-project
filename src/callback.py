@@ -151,6 +151,9 @@ class SimulatorStepLogger(Callback):
         self.system_states = []
         self.observations = []
 
+        self.first_step = True
+        self.data = None
+
     def is_target_event(self, obj, method, output, triggers):
         return (
             isinstance(obj, regelum.simulator.Simulator)
@@ -177,3 +180,16 @@ class SimulatorStepLogger(Callback):
         observation = observation.reshape(observation.size)
         self.observation_naming = obj.system.observation_naming
         self.observations.append(observation)
+
+        # create dataframe 
+        if self.first_step == True:
+            column_names = ["time"]
+            column_names.extend(self.observation_naming)
+            column_names.extend(self.state_naming)
+            self.data = pd.DataFrame(columns=column_names)
+            self.first_step = False
+
+        output_to_storage = [output[0]]
+        output_to_storage.extend([observation[i] for i, _ in enumerate(observation)])
+        output_to_storage.extend([system_state[i] for i, _ in enumerate(system_state)])
+        self.data.loc[len(self.data.index)] = output_to_storage
