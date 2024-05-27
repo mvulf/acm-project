@@ -6,8 +6,6 @@ from matplotlib.patches import Polygon
 from decimal import Decimal
 import copy
 import matplotlib.collections as mcoll
-plt.rcParams.update({'font.size': 12})
-matplotlib.use('Qt5Agg')
 
 import seaborn as sns
 sns.set_style("darkgrid")
@@ -26,23 +24,15 @@ def get_action_points(action_times, action, current_time):
     return np.array(plot_points)
 
 class HydraylicAnimation():
-    def __init__(self, trajectory_df, actions_df, l_critic, d_drop_ration, n_frames=250):
+    def __init__(self, trajectory_df, actions_df, l_critic, d_drop_ration, n_frames=200, figsize=(12, 6)):
 
-        plt.rcParams.update({'font.size': 12,
+        plt.rcParams.update({'font.size': 10,
                              'grid.color': 'gray',
                              'axes.linewidth': 1.5,
                              'animation.embed_limit': 40.0,
                               'axes.edgecolor': 'grey'})
-        plt.rcParams['figure.facecolor'] = 'black'
-
-        # create subplots and fixed subplot's positions
-        self.fig, self.axes = plt.subplots(1, 5, frameon=False, figsize=(20,9))
-        self.fig.patch.set_alpha(1)
-        self.axes[0].set_position([0.05, 0.07, 0.3, 0.4])
-        self.axes[1].set_position([0.4, 0.05, 0.2, 0.9])
-        self.axes[2].set_position([0.05, 0.55, 0.3, 0.4])
-        self.axes[3].set_position([0.65, 0.07, 0.3, 0.4])
-        self.axes[4].set_position([0.65, 0.55, 0.3, 0.4])
+        
+        self.figsize = figsize
 
         self.pst_w = 5          # piston width
         self.res_down_c = 7     # upper piston offset
@@ -140,6 +130,10 @@ class HydraylicAnimation():
         self.actions = actions_df['throttle action [µm]'].to_numpy()
         self.time_action = actions_df['time'].to_numpy()
 
+        # parsing observation dataset
+        self.obs_jet_length = actions_df['jet length [mm]'].to_numpy()
+        self.obs_jet_vel = actions_df['jet velocity [mm/s]'].to_numpy()
+
         # parsing dynamic dataset
         # parsing time
         self.time = trajectory_df['time'].to_numpy()
@@ -187,21 +181,36 @@ class HydraylicAnimation():
         self.min_p_down_color = self.down_colors[self.min_p_down_id] # is needed to drow jet and drops
 
         # config for plots
-        self.plot_dict = {3: {'data': self.l_jet_vec_init, 'color': 'red', 'y_tit': 'jet length [mm]', 'h_line': l_critic},
+        self.plot_dict = {3: {'data': self.l_jet_vec_init,
+                              'color': 'red',
+                              'y_tit': 'jet length [mm]',
+                              'label1': 'real observation',
+                              'label2': 'noise observation',
+                              'legend_loc': 'center right',
+                              'observation': self.obs_jet_length,
+                              'h_line': l_critic},
                     0: {'data': self.p_down_vec_init, 'data2': self.p_up_vec_init,
                          'color': 'red', 'color2': 'teal',
                          'label1': 'working pressure [kPa]',
                          'label2': 'hydraulic pressure [kPa]',
+                         'legend_loc': 'center right',
                            'y_tit': 'hydraulic/working pressure, [kPa]'},
                     2: {'data': self.x_th_vec_init,
                         'data2': None,
                         'actions': True,
                         'label1': 'throttle position [µm]',
                         'label2': 'throttle action [µm]',
+                        'legend_loc': 'upper right',
                         'color': 'green', 'color2': 'red',
                         'h_line': 0,
                         'y_tit': 'throttle position [µm]'},
-                    4: {'data': self.v_jet_vec_init, 'color': 'blue', 'y_tit': 'jet velocity [mm/s]'}
+                    4: {'data': self.v_jet_vec_init,
+                         'color': 'blue',
+                         'y_tit': 'jet velocity [mm/s]',
+                         'label1': 'real observation',
+                         'label2': 'noise observation',
+                         'legend_loc': 'upper right',
+                         'observation': self.obs_jet_vel}
                     }
 
         # difine statics plot limits for plots
@@ -230,6 +239,18 @@ class HydraylicAnimation():
         self.drops_time = []
         self.drops_init_vel = []
         self.time_clock_drop = 0
+
+    def init_plot(self):
+        # create subplots and fixed subplot's positions
+        self.fig, self.axes = plt.subplots(1, 5, frameon=False, figsize=self.figsize)
+        self.fig.patch.set_alpha(1)
+        
+
+        self.axes[0].set_position([0.05, 0.07, 0.3, 0.4])
+        self.axes[1].set_position([0.4, 0.05, 0.2, 0.9])
+        self.axes[2].set_position([0.05, 0.55, 0.3, 0.4])
+        self.axes[3].set_position([0.65, 0.07, 0.3, 0.4])
+        self.axes[4].set_position([0.65, 0.55, 0.3, 0.4])
 
     def get_circles(self, diam=0.3):
         """
@@ -365,8 +386,8 @@ class HydraylicAnimation():
                 # implement titles, limits, grids, tickets
                 self.axes[j].set_xlim([0, self.plot_dict[j]['x_max']*self.time_units])
                 self.axes[j].set_ylim([self.plot_dict[j]['y_min'], self.plot_dict[j]['y_max']])
-                self.axes[j].set_xlabel(xlabel='Time, [ms]', fontsize=15)
-                self.axes[j].set_ylabel(self.plot_dict[j]['y_tit'], fontsize=15)
+                self.axes[j].set_xlabel(xlabel='Time, [ms]', fontsize=10)
+                self.axes[j].set_ylabel(self.plot_dict[j]['y_tit'], fontsize=10)
 
                 self.axes[j].grid(which = "major", linewidth = 1)
                 self.axes[j].grid(which = "minor", linewidth = 0.2)
@@ -385,19 +406,34 @@ class HydraylicAnimation():
                         self.axes[j].plot(self.time[:i]*self.time_units, self.plot_dict[j]['data2'][:i],
                                            c=self.plot_dict[j]['color2'], label=self.plot_dict[j]['label2'])
                     # legend only for plots with 2 curve
-                    self.axes[j].legend(loc="upper right")
+                    self.axes[j].legend(loc=self.plot_dict[j]['legend_loc'], fontsize=9)
 
                 else:
-                    self.axes[j].plot(self.time[:i]*self.time_units, self.plot_dict[j]['data'][:i], c=self.plot_dict[j]['color'])
+                    if 'label1' in  self.plot_dict[j]:
+                        self.axes[j].plot(self.time[:i]*self.time_units, 
+                                          self.plot_dict[j]['data'][:i], 
+                                          c=self.plot_dict[j]['color'], 
+                                          label=self.plot_dict[j]['label1'])
+                    else:  
+                        self.axes[j].plot(self.time[:i]*self.time_units, self.plot_dict[j]['data'][:i], c=self.plot_dict[j]['color'])
+
+                if 'observation' in self.plot_dict[j]:
+                    current_ids = (self.time_action < self.time[i])
+                    self.axes[j].scatter(self.time_action[current_ids]*self.time_units,
+                                         self.plot_dict[j]['observation'][current_ids],
+                                         label=self.plot_dict[j]['label2'],
+                                         c=self.plot_dict[j]['color'])
+                    self.axes[j].legend(loc=self.plot_dict[j]['legend_loc'], fontsize=9) 
 
                 # add horizontal line for some plots
                 if 'h_line' in self.plot_dict[j]:
-                    self.axes[j].axhline(y = self.plot_dict[j]['h_line'], color = 'black', linewidth = 2.5, linestyle = '--') 
+                    self.axes[j].axhline(y = self.plot_dict[j]['h_line'], color = 'black', linewidth = 2.0, linestyle = '--') 
         
         # axis config for 1th axis
         self.axes[1].axis('equal')
         self.axes[1].set_xlim([-self.pst_w/2 - 2, self.pst_w/2 + 2])
         self.axes[1].set_ylim([ - 10, self.res_hight + 2])
+        self.axes[1].axis('off')
         
         # get polygon up
         polygon_up = self.get_polygon(self.x_p_vec[i], 'up', c_up=self.up_colors[i])
@@ -478,7 +514,10 @@ class HydraylicAnimation():
         return self.axes
 
 
-    def animate_system(self, interacitve=False, save_gif = False):
+    def animate_system(self, interacitve=False, save_gif = False, gif_filename = 'pistons.gif'):
+                
+        self.init_plot()
+        plt.close()
         anim = animation.FuncAnimation(self.fig, self.animate, init_func=self.init,
                                     frames=self.time.shape[0], interval=20) #, blit=True)
 
@@ -489,7 +528,7 @@ class HydraylicAnimation():
                                             metadata=dict(artist='Me'),
                                             bitrate=5000)
             
-            anim.save('pistons.gif', writer=writer, savefig_kwargs={"transparent": False, 'facecolor':'red'})
+            anim.save(gif_filename, writer=writer, savefig_kwargs={"transparent": False, 'facecolor':'red'})
 
         if interacitve: # interactive mode
             from matplotlib import rc
@@ -499,4 +538,19 @@ class HydraylicAnimation():
         else: # to show animation in window
             plt.show()
 
+    def save_last_frame(self, filename):
+        self.init_plot()
+        for i in range(self.time.shape[0]): ## needed cycle to collect time for drop dynamic
+            axes = self.animate(i)
+            if i == self.time.shape[0]-1:
+                self.fig.savefig(filename, bbox_inches='tight')
+        plt.close()
 
+    def show_last_frame(self):
+        self.init_plot()
+        for i in range(self.time.shape[0]): ## needed cycle to collect time for drop dynamic
+            axes = self.animate(i)
+            if i == self.time.shape[0]-1:
+                break
+
+        plt.show()

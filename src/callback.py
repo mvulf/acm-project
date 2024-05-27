@@ -151,6 +151,9 @@ class SimulatorStepLogger(Callback):
         self.system_states = []
         self.observations = []
 
+        self.reset()
+
+    def reset(self):
         self.first_step = True
         self.data = None
 
@@ -176,7 +179,9 @@ class SimulatorStepLogger(Callback):
         self.system_states.append(system_state)
         
         # OBSERVATION
-        observation = output[2]
+        # observation = output[2] # NOISE OBSERVATION
+        # True observation
+        observation = obj.system.get_clean_observation(system_state)
         observation = observation.reshape(observation.size)
         self.observation_naming = obj.system.observation_naming
         self.observations.append(observation)

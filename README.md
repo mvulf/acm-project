@@ -209,7 +209,7 @@ $$
 \end{equation}
 $$
 
-where $\varepsilon_x$, $\varepsilon_v$ are random noise values sampled from normal distributions with standard deviations $\sigma_x = 0.05$, $\sigma_v = 0.01$ respectively; $\hat{x}_ \text{jet}$, $\hat{v}_ \text{jet}$ are real jet length and jet velocity without noise, $10^{-3}$ and $10^{-6}$ here are used to convert [µm] to [mm] and [µm/s] to [mm/ms] respectively.
+where $\varepsilon_x$, $\varepsilon_v$ are random noise values sampled from normal distributions with standard deviations $\sigma_x = 0.10$, $\sigma_v = 0.02$ respectively; $\hat{x}_ \text{jet}$, $\hat{v}_ \text{jet}$ are real jet length and jet velocity without noise, $10^{-3}$ and $10^{-6}$ here are used to convert [µm] to [mm] and [µm/s] to [mm/ms] respectively.
 We convert them for computational efficiency.
 $\Delta \tau=1 \text{ms}$ is a control time step duration (sampling time).
 
