@@ -24,13 +24,23 @@ def get_action_points(action_times, action, current_time):
     return np.array(plot_points)
 
 class HydraylicAnimation():
-    def __init__(self, trajectory_df, actions_df, l_critic, d_drop_ration, n_frames=200, figsize=(12, 6)):
+    def __init__(
+        self, 
+        trajectory_df, 
+        actions_df, 
+        l_critic, 
+        d_drop_ration, 
+        n_frames=200, 
+        figsize=(12, 6)
+    ):
 
         plt.rcParams.update({'font.size': 10,
                              'grid.color': 'gray',
                              'axes.linewidth': 1.5,
                              'animation.embed_limit': 40.0,
-                              'axes.edgecolor': 'grey'})
+                             'legend.framealpha': 0.8,
+                             'legend.frameon': True,
+                             'axes.edgecolor': 'grey'})
         
         self.figsize = figsize
 
