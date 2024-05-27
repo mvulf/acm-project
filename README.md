@@ -214,15 +214,41 @@ We convert them for computational efficiency.
 $\Delta \tau=1 \text{ms}$ is a control time step duration (sampling time).
 
 ### Running cost
-TODO
+
+Running cost is used for both controller efficiency estimation and objective function for the MPC.
+
+Let us use the quadratic form of the observation and action as the running cost function:
+
+$$
+\begin{equation}
+    \begin{aligned}
+        & c(\tilde{y}, u) = \tilde{y}^TQ\tilde{y} +u^TRu,\\
+        & \tilde{y} = y - \begin{bmatrix}
+            l_ \text{crit}\\
+            0
+        \end{bmatrix},\\
+    \end{aligned}
+\end{equation}
+$$
+
+where $\tilde{y}$ is the observation with the target compensation (necessary to reach $x_ \text{jet} = l_ \text{crit}$);
+In the current research $Q = \text{diag}(1, 0)$, $R = \text{diag}(0)$, thus we do not penalize the controller for the jet velocity and the action.
 
 ---
 
 ## Results
 Detailed explanation of the findings, performance metrics, and outcomes of the project. This section may include graphs, tables, and other visual aids to support the results.
 
-### Subsection (if any)
-Subsections may be used to organize results into categories, discuss different algorithms or methods used, or compare various scenarios within the project.
+
+
+### PD-regulator
+
+
+
+### Model Predictive Control (MPC)
+
+
+### Comparison
 
 ---
 

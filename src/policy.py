@@ -30,13 +30,16 @@ def get_relative_observation(observation, l_crit:float, sampling_time:float):
 class PDController(Policy):
     def __init__(
         self,
-        system, # TODO: CHANGE!
         sampling_time: float,
+        system: System | ComposedSystem,
+        action_bounds: list | np.ndarray | None = None,
         P_coef:float=25.,
         D_coef:float=0.,
     ):
-        super().__init__()
-        self.system = system
+        super().__init__(
+            system=system,
+            action_bounds=action_bounds
+        )
         self.sampling_time = sampling_time
         
         self.pd_coefs: list[float] = [

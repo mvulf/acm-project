@@ -54,8 +54,8 @@ class HydraulicSystem(System):
             "sigma_work": 73e-3,
             "mu_work": 1.0e-3,
             "v_j": 200.,
-            "jet_length_std": 0., # TODO: find absolute std. Was 5e-2
-            "jet_velocity_std": 0., # TODO: find absolute std. Was 1e-2
+            "jet_length_std": 0, # Was 10e-2
+            "jet_velocity_std": 0, # Was 2e-2
             "pressure_std": 0.,
             "p_atm": 1e5, # Atmosphere (ambient) pressure, Pa
             "g": 9.81, # gravity constant, m/s^2
@@ -99,11 +99,11 @@ class HydraulicSystem(System):
                 v_j: Jet speed for the stable operation (found experimentaly)
                     [mm/s]. Defaults to 200.
                 jet_length_std: Standard deviation of Relative jet length 
-                    observation. Defaults to ?
+                    observation. Defaults to 10e-2
                 jet_velocity_std: Standard deviation of Relative jet velocity 
-                    observation. Defaults to ?
+                    observation. Defaults to 2e-2
                 pressure_std: Standard deviation of pressure sensors (manometers). 
-                    Defaults to ?
+                    Defaults to 0. We do not use it now.
                 p_atm: Atmosphere (ambient) pressure, Pa. 
                     Defaults to 1e5.
                 g: Gravity constant, m/s^2. Defaults to 9.81. 
