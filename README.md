@@ -89,7 +89,7 @@ $$
             \end{cases}\\
             & \dot x_ \text{th} = f_ \text{th}\cdot (x^\text{act}_ \text{th} - x_ \text{th})\\
             & \dot p_ \text{hydr} = K_ \text{hydr} \frac{
-                \text{sign}(p_ \text{l} - p_ \text{hydr})B_ \text{th}\hat{x}_\text{th}\sqrt{|p_ \text{l} - p_ \text{hydr}|} - v_ \text{p}
+                \text{sign}(p_ \text{l} - p_ \text{hydr})B_ \text{th}\hat{x}_ \text{th}\sqrt{|p_ \text{l} - p_ \text{hydr}|} - v_ \text{p}
             }{x_ \text{p}}\\
             & \dot p_ \text{work} = K_ \text{work} \frac{
                 v_ \text{p} - \text{sign}(p_ \text{work} - p_ \text{atm})B_ \text{exit}\sqrt{|p_ \text{work} - p_ \text{atm}|}
