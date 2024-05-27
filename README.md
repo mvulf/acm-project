@@ -156,7 +156,27 @@ $$
 where $F_\text{C} = p_\text{C}\max(A_\text{hydr}, A_\text{work})$, $p_\text{C} = 10^4 [\text{Pa}]$ is pressure difference, which is necessary to overcome the dry friction.
 
 ### Droplet detaching condition
-TODO
+
+According to linear stability analysis and experiments conducted by Grant and Middleman [[2](https://doi.org/10.1002/aic.690120411)], there is a critical (breakup) jet length $x_ \text{jet} = l_ \text{crit} [\text{mm}]$, after which the drop separates.
+This critical jet length may be defined by Reynolds number $(\text{Re})$ and Weber number $(\text{We})$:
+
+$$
+\begin{equation}
+    \begin{aligned}
+        & \frac{l_ \text{crit}}{D_ \text{exit}} = 19.5\cdot 10^3 \text{We}^{0.5}(1 + 3\text{Oh})^{0.85}, \\
+        & \text{We} = \frac{\rho_ \text{work} v_ \text{j}^2 D_ \text{exit}}{10^{6} \sigma_ \text{work}}, \quad
+        \text{Oh} = \frac{\sqrt{\text{We}}}{\text{Re}}, \\
+        & \text{Re} = \frac{\rho_ \text{work} v_ \text{j} D_ \text{exit}}{10^{3} \mu_ \text{work}}, \\
+    \end{aligned}
+\end{equation}
+$$
+
+where
+$\mu_ \text{work} = 10^{-3} [\text{Pa}\cdot\text{s}]$ (for water) is the dynamic viscosity of the working liquid;
+$v_ \text{j} = 0.2\cdot 10^3 [\text{mm/s}]$ is jet velocity (empirically estimated in [[1](https://doi.org/10.3390/coatings13010129)]);
+coefficients $10^{6}$ and $10^{3}$ appear since jet velocity is in mm/s.
+Other values are in SI.
+
 ### Observations
 TODO
 ### Running cost
@@ -214,3 +234,5 @@ Open [main.ipynb](./main.ipynb) and 'Run All'
 ## Bibliography
 
 [[1](https://doi.org/10.3390/coatings13010129)] M.Vulf,V.Petrov,A.Sulimov,A.Simonova,A.Kazak,S.Chugunov, and D. Kolomenskiy, “A novel droplet generator and a bench-testing rig enabling research on suspension droplet wall impingement and particle deposition,” Coatings, vol. 13, no. 1, p. 129, jan 2023.
+
+[[2](https://doi.org/10.1002/aic.690120411)] R. P. Grant and S. Middleman, “Newtonian jet stability,” AIChE Journal, vol. 12, no. 4, pp. 669–678, jul 1966.
