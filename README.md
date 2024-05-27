@@ -190,7 +190,28 @@ $$
 This means that the jet length should be above the critical jet length, but converge to it.
 
 ### Observations
-TODO
+
+Let us assume, that a camera at the bottom of the droplet generator allows to retrieve current jet length $x_ \text{jet} [\text{mm}]$ and calculate jet velocity $v_ \text{jet} [\text{mm/ms}]$ as system observations with noise:
+
+$$
+\begin{equation}
+    \begin{aligned}
+        & y = \begin{bmatrix}
+            x_ \text{jet}\\
+            v_ \text{jet}\\
+        \end{bmatrix}, \qquad
+        \varepsilon_ x \sim \mathcal{N}(0, \sigma_ x^2), \qquad \varepsilon_ v \sim \mathcal{N}(0, \sigma_ v ^2), \\
+        & \hat{x}_ \text{jet} = 10^{-3}\frac{D^2_ \text{work}}{D^2_ \text{exit}} (x_ \text{p} - x_ \text{p0}), \qquad
+        \hat{v}_ \text{jet} = 10^{-6}\frac{D^2_ \text{work}}{D^2_ \text{exit}} v_ \text{p}, \\
+        & x_ \text{jet} = \hat{x}_ \text{jet} + l_ \text{crit}\varepsilon_x, \qquad
+        v_ \text{jet} = \hat{v}_ \text{jet} + 10^{-3}\frac{l_ \text{crit}}{\Delta \tau}\varepsilon_ v, \\
+    \end{aligned}
+\end{equation}
+$$
+
+where $\varepsilon_x$, $\varepsilon_v$ are random noise values sampled from normal distributions with standard deviations $\sigma_x = 0.05$, $\sigma_v = 0.01$ respectively; $\hat{x}_\text{jet}$, $\hat{v}_\text{jet}$ are real jet length and jet velocity without noise, $10^{-3}$ and $10^{-6}$ here are used to convert [µm] to [mm] and [µm/s] to [mm/ms] respectively.
+We convert them for computational efficiency.
+$\Delta \tau=1 \text{ms}$ is a control time step duration (sampling time).
 
 ### Running cost
 TODO
