@@ -240,11 +240,7 @@ In the current research $Q = \text{diag}(1, 0)$, $R = \text{diag}(0)$, thus we d
 
 Let us use **relative value function (or total cost)** for one episode as the metric to compare different controllers:
 
-$$
-    V_ \text{episode}(\tilde{y}, u)= \sum^{T}_{t=1}{
-        \gamma^t \frac{c(\tilde{y}_t,u_t)}{l^2_ \text{crit}}\Delta \tau
-    }
-$$
+$$ V_ \text{episode}(\tilde{y}, u) = \sum_{t=1}^T  \gamma^t \frac{c(\tilde{y}_ \text{t},u_ \text{t})}{l^2_ \text{crit}} \Delta \tau $$
 
 where $t$ is the time step index, $T=10$ is the number of steps inside an episode, $\gamma=1$ is a discount factor.
 
@@ -270,7 +266,7 @@ Relative total cost: $2.86$.
 MPC is constructed in the following manner:
 
 $$
-    \rho(y _t) = \argmin_{u_t \in \mathbb{U}} \left(  \min_{\{u_{t + i}\}_{i=1}^{N - 1} \in \mathbb{U}^{N - 1}}\sum_{k = 0}^{N - 1}  c(\tilde{y}_ {t+k},u_ {t+k})\right)
+    \rho(y_t) = \text{arg} \min_ {u_ t \in \mathbb{U}} \left(  \min_{\{u_ {t + i}\}_ {i=1}^{N - 1} \in \mathbb{U}^{N - 1}}\sum_ {k = 0}^{N - 1}  c(\tilde{y}_ {t+k},u_ {t+k})\right)
 $$
 
 where $N=5$ is the prediction horizon.
