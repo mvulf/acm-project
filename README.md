@@ -237,16 +237,72 @@ In the current research $Q = \text{diag}(1, 0)$, $R = \text{diag}(0)$, thus we d
 ---
 
 ## Results
-Detailed explanation of the findings, performance metrics, and outcomes of the project. This section may include graphs, tables, and other visual aids to support the results.
 
+Let us use **relative value function (or total cost)** for one episode as the metric to compare different controllers:
 
+$$
+    V_ \text{episode}(\tilde{y}, u)= \sum^{T}_{t=1}{
+        \gamma^t \frac{c(\tilde{y}_t,u_t)}{l^2_ \text{crit}}\Delta \tau
+    }
+$$
+
+where $t$ is the time step index, $T=10$ is the number of steps inside an episode, $\gamma=1$ is a discount factor.
 
 ### PD-regulator
 
+PD-regulator is constructed in the following manner:
+
+$$
+    u(x_ \text{jet}, v_ \text{jet}) := P\left(1 - \frac{x_ \text{jet}}{l_ \text{crit}}\right)
+    - D\left(\frac{v_ \text{jet}\Delta \tau}{l_ \text{crit}} \right)
+$$
+
+where $P = U_\text{max}=20$, $D = 0$.
+
+Below you can see plotting results:
+...
+
+Relative total cost: $2.86$.
 
 
 ### Model Predictive Control (MPC)
 
+MPC is constructed in the following manner:
+
+$$
+    \rho(y _t) = \argmin_{u_t \in \mathbb{U}} \left(  \min_{\{u_{t + i}\}_{i=1}^{N - 1} \in \mathbb{U}^{N - 1}}\sum_{k = 0}^{N - 1}  c(\tilde{y}_ {t+k},u_ {t+k})\right)
+$$
+
+where $N=5$ is the prediction horizon.
+
+Thus, this policy on each sampling time step finds such set of actions that minimizes sum of the running costs in finite prediction horizon and implements first action from this optimal set of actions.
+
+Predictions for the MPC are calculated by quasi-stationary system derived from the full system ($\dot v_ \text{p}=0$, $\dot p_ \text{hydr}=0$, $\dot p_ \text{work}=0$):
+
+$$
+\begin{equation}
+    \begin{aligned}
+        & \frac{\partial x}{\partial \tau} = \begin{cases}
+            & \dot x_ \text{p} = v_ \text{p} = \text{sign}(p_ \text{l} - \hat p_ \text{hydr}) B_ \text{th} x_ \text{th} \sqrt{|p_ \text{l} - \hat p_ \text{hydr}|} \\
+            & \dot x_ \text{th} = f_ \text{th}\cdot (x^\text{act}_ \text{th} - x_ \text{th})\\
+        \end{cases},\\
+        & \hat p_ \text{hydr} = \frac{\hat F_ \text{hydr} + p_ \text{atm}A_ \text{work} + p_ \text{l}A_ \text{work} \left(\frac{x_ \text{th} B_ \text{th}}{B_ \text{exit}}\right)^2}{A_ \text{hydr} + A_ \text{work}\left(\frac{x_ \text{th} B_ \text{th}}{B_ \text{exit}}\right)^2},\\
+        & \hat F_ \text{hydr} = \begin{cases}
+            & \frac{m_ \text{p}g}{\text{sign}(v_ \text{p})(1 - \eta) - 1},\\
+            & \qquad \text{if } (1 - \eta)\frac{m_ \text{p}g}{\text{sign}(v_ \text{p})(1 - \eta) - 1}>F_ \text{C}\\
+            & \text{sign}(v_ \text{p})F_ \text{C} - m_ \text{p}g, \\
+            & \qquad \text{ overwise}\\
+        \end{cases}\\
+    \end{aligned}
+\end{equation}
+$$
+
+This system is integrated by Eulear integration step.
+
+Below you can see plotting results:
+...
+
+Relative total cost: $2.26$.
 Thus, value (or total cost) was reduced by more than $21\%$.
 
 ---
