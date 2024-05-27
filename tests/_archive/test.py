@@ -4,7 +4,7 @@ import numpy as np
 from regelum.scenario import Scenario
 from regelum.simulator import SciPy
 
-from src.system import HydraulicSystem
+from src.old_system import HydraulicSystem
 from src.policy import PDController
 
 sampling_time = 1e-3
