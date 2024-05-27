@@ -260,7 +260,7 @@ $$
 where $P = U_\text{max}=20$, $D = 0$.
 
 Below you can see plotting results:
-...
+![PD contorller without noize](img/system_animation_pd.gif)
 
 Relative total cost: $2.86$.
 
@@ -300,7 +300,7 @@ $$
 This system is integrated by Eulear integration step.
 
 Below you can see plotting results:
-...
+![PD contorller without noize](img/system_animation_mpc.gif)
 
 Relative total cost: $2.26$.
 Thus, value (or total cost) was reduced by more than $21\%$.
