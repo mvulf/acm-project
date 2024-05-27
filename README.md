@@ -41,6 +41,7 @@ To solve this problem, an optimal control system is developing.
 ### State dynamics
 
 The system state parameters are the piston position $x_\text{p} [\text{µm}]$, piston velocity $v_\text{p} [\text{µm/s}]$, throttle position $x_\text{th} [\text{µm}]$, hydraulic container pressure $p_\text{hydr} [\text{Pa}]$ and working container pressure $p_\text{work} [\text{Pa}]$:
+
 $$
 \begin{equation}
     x = \begin{bmatrix}
@@ -56,6 +57,7 @@ $$
 The piston moves by the action of the gravity $(m_\text{p}g)$, hydraulic $(F_\text{hydr})$ and friction $(F_\text{fr})$ forces.
 Piston mass $m_\text{p} = 0.2\cdot 10^{-1} \text{kg}$.
 The injector tip position setting $x^\text{act}_\text{th}$ is considered as the action to the hydraulic machinery, since the injector tip position $x_\text{th}$ cannot be changed immediately:
+
 $$
 \begin{equation}
 u = x^\text{act}_\text{th}
@@ -73,6 +75,7 @@ The state dynamics function is thus as follows:
             \dot{p}_\text{hydr} \\
             \dot{p}_\text{work} \\
         \end{bmatrix},\\ -->
+
 $$
 \begin{equation}
     \begin{aligned}
@@ -96,10 +99,12 @@ $$
     \end{aligned}
 \end{equation}
 $$
+
 where $f_\text{th}=500 \text{Hz}$ is the piezoelectric element frequency;
 $x_\text{p0}, h_\text{work0}$ are the initial piston position and the initial working liquid height respectively;
 $K_\text{hydr} = \frac{1}{\beta_{V hydr}}$ and $K_\text{work} = \frac{1}{\beta_{V work}}$ are the bulk moduluses of hydraulic and working liquids respectively. Bulk modulus is the measure of the resistance of a substence to bulk compression: $K = -V\frac{dP}{dV}$; 
 $B_\text{th}, B_\text{exit}$ are the volume flow rate coefficients:
+
 $$
 \begin{equation}
     \begin{aligned}
@@ -109,11 +114,13 @@ $$
     \end{aligned}
 \end{equation}
 $$
+
 where $C_\text{Dth}, C_\text{Dexit}$ are throttle and exit dischrage coefficients respectively. They may be defined by the local hydraulic resistance coefficient $\zeta_{\bullet}$: $C_{D\bullet} = \sqrt{\frac{1}{\zeta_{\bullet}}}$.
 
 Let us consider the hydraulic and friction forces separately.
 #### Hydraulic force
 The hydraulic force is the result of a pressure difference acting on the piston:
+
 $$
 \begin{equation}
     \begin{aligned}
@@ -121,7 +128,9 @@ $$
     \end{aligned}
 \end{equation}
 $$
+
 where $A_\text{hydr}$, $A_\text{work}$ are cross-sectional areas of the hydraulic and working containers respectively, determined by container diameters $(D_\text{hydr}, D_\text{work})$:
+
 $$
 \begin{equation}
     A_\text{hydr} = \frac{\pi D_\text{hydr}^2}{4},\qquad A_\text{work} = \frac{\pi D_\text{work}^2}{4}
@@ -132,6 +141,7 @@ $$
 Friction force is estimated by the mechanical efficiency approach.
 When the piston does not move, it must overcome the Coulomb friction force $(F_\text{C})$ to start moving.
 When piston moves, friction force is the maximum between Coulomb friction force and hydraulic force losses determined by the mechanical efficiency $\eta = 0.7$:
+
 $$
 \begin{equation}
     F_\text{fr}(v_\text{p}, F_\text{hydr}) = \begin{cases} 
@@ -143,6 +153,7 @@ $$
     \end{cases}
 \end{equation}
 $$
+
 where $F_\text{C} = p_\text{C}\max(A_\text{hydr}, A_\text{work})$, $p_\text{C} = 10^4 [\text{Pa}]$ is pressure difference, which is necessary to overcome the dry friction.
 
 ### Droplet detaching condition
