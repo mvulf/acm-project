@@ -60,11 +60,11 @@ class HistoricalDataCallback(HistoricalCallback):
                     },
                     **dict(zip(self.action_components_naming, output["action"][0])),
                     **dict(
-                        zip(self.observation_components_naming, output["estimated_state"][0])
+                        zip(self.observation_components_naming, output["observation"][0])
                     ),
-                    # **dict(
-                    #     zip(self.state_components_naming, output["estimated_state"][0])
-                    # ),
+                    **dict(
+                        zip(self.state_components_naming, output["estimated_state"][0])
+                    ),
                 }
             )
         elif method == "dump_data_buffer":
@@ -91,8 +91,8 @@ class HistoricalDataCallback(HistoricalCallback):
                     )
                     for columns, key in [
                         (self.action_components_naming, "action"),
+                        (self.observation_components_naming, "observation"),
                         (self.state_components_naming, "estimated_state"),
-                        # (self.state_components_naming, "estimated_state"),
                     ]
                 ],
                 axis=1,
