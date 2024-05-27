@@ -538,7 +538,7 @@ class HydraylicAnimation():
                                             metadata=dict(artist='Me'),
                                             bitrate=5000)
             
-            anim.save(gif_filename, writer=writer, savefig_kwargs={"transparent": False, 'facecolor':'red'})
+            anim.save(gif_filename, writer=writer, dpi=400, savefig_kwargs={"transparent": False, 'facecolor':'red'})
 
         if interacitve: # interactive mode
             from matplotlib import rc
