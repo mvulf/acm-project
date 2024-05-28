@@ -279,9 +279,15 @@ $$
 \begin{equation}
     \begin{aligned}
         & \frac{\partial x}{\partial \tau} = \begin{cases}
-            & \dot x_ \text{p} = v_ \text{p} = \text{sign}(p_ \text{l} - \hat p_ \text{hydr}) B_ \text{th} x_ \text{th} \sqrt{|p_ \text{l} - \hat p_ \text{hydr}|} \\
+            & \dot x_ \text{p} = \begin{cases}
+                & v_ \text{p},
+                \quad \text{if } x_ \text{th} > 0\\
+                & 10^{-10}v_ \text{p},
+                \quad \text{ overwise}\\
+            \end{cases}\\
             & \dot x_ \text{th} = f_ \text{th}\cdot (x^\text{act}_ \text{th} - x_ \text{th})\\
         \end{cases},\\
+        & v_ \text{p} = \text{sign}(p_ \text{l} - \hat p_ \text{hydr}) B_ \text{th} x_ \text{th} \sqrt{|p_ \text{l} - \hat p_ \text{hydr}|} \\
         & \hat p_ \text{hydr} = \frac{\hat F_ \text{hydr} + p_ \text{atm}A_ \text{work} + p_ \text{l}A_ \text{work} \left(\frac{x_ \text{th} B_ \text{th}}{B_ \text{exit}}\right)^2}{A_ \text{hydr} + A_ \text{work}\left(\frac{x_ \text{th} B_ \text{th}}{B_ \text{exit}}\right)^2},\\
         & \hat F_ \text{hydr} = \begin{cases}
             & \frac{m_ \text{p}g}{\text{sign}(v_ \text{p})(1 - \eta) - 1},\\
