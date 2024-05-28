@@ -313,7 +313,7 @@ Below you can see plotting results:
 ![MPC contorller](results/system_animation_mpc.gif)
 
 Relative total cost: $2.26$.
-Thus, value (or total cost) was reduced by more than $21\%$.
+Thus, value (or total cost) was reduced by more than $21$%.
 
 ---
 
@@ -345,7 +345,7 @@ $$ \sigma_ \text{jetVelocity} = 10 $$
 | PD      | $1.15⋅10^{-1}$             | $2.88⋅10^{-2}$             | $2.83$                  | $0.17$                 |
 | MPC     | $3.06⋅10^{-3}$             | $4.10⋅10^{-3}$             | $2.89$                  | $1.2$                  |
 
-Thus, we can see that for the "clean" observations MPC works better than PD (value was reduced by more than $21\%$).
+Thus, we can see that for the "clean" observations MPC works better than PD (value was reduced by more than $21$%).
 However, when noise appears, value for MPC is not better than for PD. 
 That is because of two episodes with negative initial jet length observation.
 So, it is necessary to clip negative jet length before state-estimation by observer.
