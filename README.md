@@ -204,7 +204,7 @@ $$
         & \hat{x}_ \text{jet} = 10^{-3}\frac{D^2_ \text{work}}{D^2_ \text{exit}} (x_ \text{p} - x_ \text{p0}), \qquad
         \hat{v}_ \text{jet} = 10^{-6}\frac{D^2_ \text{work}}{D^2_ \text{exit}} v_ \text{p}, \\
         & x_ \text{jet} = \hat{x}_ \text{jet} + l_ \text{crit}\varepsilon_x, \qquad
-        v_ \text{jet} = \hat{v}_ \text{jet} + 10^{-3}\frac{l_ \text{crit}}{\Delta \tau}\varepsilon_ v, \\
+        v_ \text{jet} = \hat{v}_ \text{jet} + \frac{l_ \text{crit}}{\Delta \tau}\varepsilon_ v, \\
     \end{aligned}
 \end{equation}
 $$
