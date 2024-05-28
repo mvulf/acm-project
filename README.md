@@ -264,7 +264,7 @@ $$
 where $P = U_\text{max}=20$, $D = 0$.
 
 Below you can see plotting results:
-![PD contorller without noize](img/system_animation_pd.gif)
+![PD contorller](results/system_animation_pd.gif)
 
 Relative total cost: $2.86$.
 
@@ -310,10 +310,26 @@ $$
 This system is integrated by Eulear integration step.
 
 Below you can see plotting results:
-![PD contorller without noize](img/system_animation_mpc.gif)
+![MPC contorller](results/system_animation_mpc.gif)
 
 Relative total cost: $2.26$.
 Thus, value (or total cost) was reduced by more than $21\%$.
+
+---
+
+## let's see at the controller's work with system with a noisy observation
+
+$$ \sigma_ \text{jetLength} = 0.1 $$
+
+$$ \sigma_ \text{jetVelocity} = 10 $$
+
+#### PD controller
+
+![PD contorller with noize](results/system_animation_pd_noize.gif)
+
+#### MPC controller
+
+![MPC contorller with noize](results/system_animation_mpc_noize.gif)
 
 ---
 
@@ -350,7 +366,9 @@ pip install -r requirements.txt
 ### Running the Code
 ___
 
-To reproduce full research please open [main.ipynb](./main.ipynb) and `Run All`.
+To reproduce full research please open [main.ipynb](./main.ipynb) and `Run All`. 
+
+Please find anumations code in [notebooks](./notebooks/).
 
 ---
 
