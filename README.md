@@ -244,6 +244,14 @@ $$ V_ \text{episode}(\tilde{y}, u) = \sum_{t=1}^T  \gamma^t \frac{c(\tilde{y}_ \
 
 where $t$ is the time step index, $T=10$ is the number of steps inside an episode, $\gamma=1$ is a discount factor.
 
+For the experiments with noise, relative value function averaged by episodes is used:
+
+$$
+    V(\tilde{y}, u) = \frac{1}{M}\sum_{j=1}^M V_ \text{episode}(\tilde{y}, u)
+$$
+
+where $j$ is the episode index, $M$ is the number of episodes.
+
 ### PD-regulator
 
 PD-regulator is constructed in the following manner:
