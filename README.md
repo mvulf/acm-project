@@ -331,6 +331,21 @@ $$ \sigma_ \text{jetVelocity} = 10 $$
 
 ![MPC contorller with noize](results/system_animation_mpc_noize.gif)
 
+### Comparison
+
+| Control | Last   running cost mean | Last   running cost  std | Episodic   value mean | Episodic   value std |
+|---------|--------------------------|--------------------------|-----------------------|----------------------|
+| PD      | $1.15⋅10^{-1}$             | $2.88⋅10^{-2}$             | $2.83$                  | $0.17$                 |
+| MPC     | $3.06⋅10^{-3}$             | $4.10⋅10^{-3}$             | $2.89$                  | $1.2$                  |
+
+## Further research steps
+
+- Clip negative jet length!
+- Add running cost evaluation on “real” observation 
+- Add droplet-detaching terminal cost
+- Add Kalman-filter on observations
+
+
 ---
 
 ## Run the Project
