@@ -30,7 +30,7 @@ class HydraylicAnimation():
         actions_df, 
         l_critic, 
         d_drop_ration, 
-        n_frames=200, 
+        n_frames=100, 
         figsize=(12, 6)
     ):
 
@@ -533,12 +533,12 @@ class HydraylicAnimation():
 
         if save_gif:
             # # To save the animation using Pillow as a gif
-            writer = animation.PillowWriter(fps=80,
+            writer = animation.PillowWriter(fps=40,
                                             codec="gif",
                                             metadata=dict(artist='Me'),
                                             bitrate=5000)
             
-            anim.save(gif_filename, writer=writer, dpi=400, savefig_kwargs={"transparent": False, 'facecolor':'red'})
+            anim.save(gif_filename, writer=writer, dpi=300, savefig_kwargs={"transparent": False, 'facecolor':'red'})
 
         if interacitve: # interactive mode
             from matplotlib import rc
