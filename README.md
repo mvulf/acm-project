@@ -6,7 +6,7 @@ The **goal** of this project is to create an optimal control of the droplet gene
 
 - Course: Advanced Control Methods, Skoltech, 2024
 - Team Members: [Mikhail Vulf](https://github.com/mvulf/), [Aleksandr Kolomeitcev](https://github.com/Alexander19970212)
-- Final Presentation: [Link to Presentation]
+- Final Presentation: [Link to Presentation](./results/ACM-DropGenMPC.pdf)
 
 ---
 
