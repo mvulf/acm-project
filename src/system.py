@@ -33,33 +33,7 @@ class HydraulicSystem(System):
         self,
         init_state,
         *args,
-        system_parameters_init = {
-            "p_l_gauge": 1.5e5,
-            "x_th_limits": (0., 20.),
-            "freq_th": 500.0,
-            "m_p": 20e-3,
-            "D_th": 200e-6, # WAS 200e-6, then 5e-3
-            "D_hydr": 20e-3,
-            "D_work": 20e-3,
-            "h_work_init": 1e3,
-            "D_exit": 0.33e-3,
-            "l_exit": 8.5e-3,
-            "p_coulomb": 10e3, # WAS 10e3, then 1e3
-            "eta": 0.70,
-            "zeta_th": 5.0, # WAS 5.0, then 0.1
-            "rho_hydr": 1e3,
-            "rho_work": 1e3,
-            "beta_v_hydr": 0.49e-9,
-            "beta_v_work": 0.49e-9,
-            "sigma_work": 73e-3,
-            "mu_work": 1.0e-3,
-            "v_j": 200.,
-            "jet_length_std": 0, # Was 10e-2
-            "jet_velocity_std": 0, # Was 2e-2
-            "pressure_std": 0.,
-            "p_atm": 1e5, # Atmosphere (ambient) pressure, Pa
-            "g": 9.81, # gravity constant, m/s^2
-        },
+        system_parameters_init=None,
         **kwargs,
     ):
         """Droplet generator (hydraulic) system
@@ -110,6 +84,35 @@ class HydraulicSystem(System):
         """
         
         self.init_state = init_state
+        
+        if system_parameters_init is None:
+            system_parameters_init = {
+                "p_l_gauge": 1.5e5,
+                "x_th_limits": (0., 20.),
+                "freq_th": 500.0,
+                "m_p": 20e-3,
+                "D_th": 200e-6, # WAS 200e-6, then 5e-3
+                "D_hydr": 20e-3,
+                "D_work": 20e-3,
+                "h_work_init": 1e3,
+                "D_exit": 0.33e-3,
+                "l_exit": 8.5e-3,
+                "p_coulomb": 10e3, # WAS 10e3, then 1e3
+                "eta": 0.70,
+                "zeta_th": 5.0, # WAS 5.0, then 0.1
+                "rho_hydr": 1e3,
+                "rho_work": 1e3,
+                "beta_v_hydr": 0.49e-9,
+                "beta_v_work": 0.49e-9,
+                "sigma_work": 73e-3,
+                "mu_work": 1.0e-3,
+                "v_j": 200.,
+                "jet_length_std": 0, # Was 10e-2
+                "jet_velocity_std": 0, # Was 2e-2
+                "pressure_std": 0.,
+                "p_atm": 1e5, # Atmosphere (ambient) pressure, Pa
+                "g": 9.81, # gravity constant, m/s^2
+            }
         
         super().__init__(
             *args,
