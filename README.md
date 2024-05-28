@@ -204,7 +204,7 @@ $$
         & \hat{x}_ \text{jet} = 10^{-3}\frac{D^2_ \text{work}}{D^2_ \text{exit}} (x_ \text{p} - x_ \text{p0}), \qquad
         \hat{v}_ \text{jet} = 10^{-6}\frac{D^2_ \text{work}}{D^2_ \text{exit}} v_ \text{p}, \\
         & x_ \text{jet} = \hat{x}_ \text{jet} + l_ \text{crit}\varepsilon_x, \qquad
-        v_ \text{jet} = \hat{v}_ \text{jet} + 10^{-3}\frac{l_ \text{crit}}{\Delta \tau}\varepsilon_ v, \\
+        v_ \text{jet} = \hat{v}_ \text{jet} + \frac{l_ \text{crit}}{\Delta \tau}\varepsilon_ v, \\
     \end{aligned}
 \end{equation}
 $$
@@ -244,6 +244,14 @@ $$ V_ \text{episode}(\tilde{y}, u) = \sum_{t=1}^T  \gamma^t \frac{c(\tilde{y}_ \
 
 where $t$ is the time step index, $T=10$ is the number of steps inside an episode, $\gamma=1$ is a discount factor.
 
+For the experiments with noise, relative value function averaged by episodes is used:
+
+$$
+    V(\tilde{y}, u) = \frac{1}{M}\sum_{j=1}^M V_ \text{episode}(\tilde{y}, u)
+$$
+
+where $j$ is the episode index, $M$ is the number of episodes.
+
 ### PD-regulator
 
 PD-regulator is constructed in the following manner:
@@ -279,9 +287,15 @@ $$
 \begin{equation}
     \begin{aligned}
         & \frac{\partial x}{\partial \tau} = \begin{cases}
-            & \dot x_ \text{p} = v_ \text{p} = \text{sign}(p_ \text{l} - \hat p_ \text{hydr}) B_ \text{th} x_ \text{th} \sqrt{|p_ \text{l} - \hat p_ \text{hydr}|} \\
+            & \dot x_ \text{p} = \begin{cases}
+                & v_ \text{p},
+                \quad \text{if } x_ \text{th} > 0\\
+                & 10^{-10}v_ \text{p},
+                \quad \text{ overwise}\\
+            \end{cases}\\
             & \dot x_ \text{th} = f_ \text{th}\cdot (x^\text{act}_ \text{th} - x_ \text{th})\\
         \end{cases},\\
+        & v_ \text{p} = \text{sign}(p_ \text{l} - \hat p_ \text{hydr}) B_ \text{th} x_ \text{th} \sqrt{|p_ \text{l} - \hat p_ \text{hydr}|} \\
         & \hat p_ \text{hydr} = \frac{\hat F_ \text{hydr} + p_ \text{atm}A_ \text{work} + p_ \text{l}A_ \text{work} \left(\frac{x_ \text{th} B_ \text{th}}{B_ \text{exit}}\right)^2}{A_ \text{hydr} + A_ \text{work}\left(\frac{x_ \text{th} B_ \text{th}}{B_ \text{exit}}\right)^2},\\
         & \hat F_ \text{hydr} = \begin{cases}
             & \frac{m_ \text{p}g}{\text{sign}(v_ \text{p})(1 - \eta) - 1},\\
