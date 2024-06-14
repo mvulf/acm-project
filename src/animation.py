@@ -194,7 +194,7 @@ class HydraylicAnimation():
         self.plot_dict = {3: {'data': self.l_jet_vec_init,
                               'color': 'red',
                               'y_tit': 'jet length [mm]',
-                              'label1': 'real observation',
+                              'label1': 'ground truth',
                               'label2': 'noise observation',
                               'legend_loc': 'center right',
                               'observation': self.obs_jet_length,
@@ -217,7 +217,7 @@ class HydraylicAnimation():
                     4: {'data': self.v_jet_vec_init,
                          'color': 'blue',
                          'y_tit': 'jet velocity [mm/s]',
-                         'label1': 'real observation',
+                         'label1': 'ground truth',
                          'label2': 'noise observation',
                          'legend_loc': 'upper right',
                          'observation': self.obs_jet_vel}
